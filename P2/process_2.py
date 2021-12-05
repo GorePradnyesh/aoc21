@@ -1,40 +1,52 @@
 
 depth_key = 'depth'
 horizontal_key = 'horizontal'
+aim_key = 'aim'
 
 def processInput(filePath):
     with open(filePath) as fp:
         process_motion(fp)
 
-def readNextDisplacement(fpHandle):
-    displacement_str = fpHandle.readline()
+def readNextDisplacement(displacement_str):
+    displacement = {depth_key:None, horizontal_key:None}
     if displacement_str:        
-        displacement = {depth_key: 0, horizontal_key:0}
         displacement_value = int(displacement_str.split()[-1])
         if displacement_str.startswith('forward'):
-            displacement[horizontal_key] += displacement_value
+            displacement[horizontal_key] = displacement_value
         elif displacement_str.startswith('down'):
-            displacement[depth_key] += displacement_value
+            displacement[depth_key] = displacement_value
         elif displacement_str.startswith('up'):
-            displacement[depth_key] -= displacement_value
+            displacement[depth_key] = displacement_value * -1
         return displacement
-    return None
 
-def displace(current_dislacement, new_displacement):
-    return {depth_key: (current_dislacement[depth_key] + new_displacement[depth_key]), 
-        horizontal_key: (current_dislacement[horizontal_key] + new_displacement[horizontal_key])}
+def displaceWithAim(current_position, displacement):
+    if displacement[horizontal_key]:
+        current_position[horizontal_key] += displacement[horizontal_key]
+        current_position[depth_key] += displacement[horizontal_key] * current_position[aim_key]
+    elif displacement[depth_key]:
+        current_position[aim_key] += displacement[depth_key]
+    return current_position
+
+def simpleDisplace(current_position, displacement):
+    if displacement[horizontal_key]:
+        current_position[horizontal_key] += displacement[horizontal_key]
+    elif displacement[depth_key]:
+        current_position[depth_key] += displacement[depth_key]
+    return current_position
 
 ##################################################################
 
 def process_motion(fpHandle):
-    initial_displacement = {depth_key: 0, horizontal_key:0}
-    new_displacement = {} 
-    while new_displacement is not None:
-        new_displacement = readNextDisplacement(fpHandle)
-        if new_displacement:
-            initial_displacement = displace(initial_displacement, new_displacement)
-    print(initial_displacement)
-    print('total displacement: ', initial_displacement[depth_key] * initial_displacement[horizontal_key])
+    position = {depth_key: 0, horizontal_key:0, aim_key:0}
+    displacement_str = ' '
+    while displacement_str:
+        displacement_str = fpHandle.readline()
+        if displacement_str:
+            displacement = readNextDisplacement(displacement_str)
+            # position = simpleDisplace(position, displacement)
+            position = displaceWithAim(position, displacement)            
+    print(position)
+    print('total displacement: ', position[depth_key] * position[horizontal_key])
 
 def process():
     filePath = '/Users/pgore/dev/AOC21/P2/input/input1.txt'
