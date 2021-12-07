@@ -1,6 +1,9 @@
 ########################################################
 from typing import final
 
+operation_o2_gen_rating = 1
+operation_co2_scrubber = 0
+
 def process_histogram(input_values):
     histogram = None
     field_size = 0
@@ -74,27 +77,44 @@ def filter_values(bit_position, field_size, input_values, bias):
                 filtered_values.append(bin_input_str)
     return filtered_values
         
+def get_bias(one_count, input_size, operation):
+    bias = None
+    if operation == operation_o2_gen_rating:
+        bias = 1 if (one_count >= input_size / 2) else 0
+    elif operation == operation_co2_scrubber:
+        bias = 0 if (one_count >= input_size / 2) else 1
+    return bias
 
-def process_ls(fpHandle):
-    input_values = fpHandle.readlines()
-    input_count = len(input_values)
-    field_size = len(input_values[0].strip())
-    
+def process_operation(input_values, field_size, operation):
     filtered_values = input_values
     # Walk each bit position
     for bit_position in range(field_size):
        one_count = process_values(bit_position, filtered_values, field_size)
-       bias = 1 if (one_count >= len(filtered_values) / 2) else 0
-       print(bias)
+       bias = get_bias(one_count, len(filtered_values), operation)
+       # print(bias)
        filtered_values = filter_values(bit_position, field_size, filtered_values, bias)
-       print(filtered_values)
+       # print(filtered_values)
+       if len(filtered_values) == 1:
+           break
+    return filtered_values[0]
 
-       
+# processes while holding all values memory. Can do better !
+def process_ls(fpHandle):
+    input_values = fpHandle.readlines()
+    field_size = len(input_values[0].strip())
+    
+    o2_gen_rating_str = process_operation(input_values, field_size, operation_o2_gen_rating)
+    o2_gen_rating = int(o2_gen_rating_str.strip(), base=2)
+    # print(o2_gen_rating)
+    co2_scrubber_rating_str = process_operation(input_values, field_size, operation_co2_scrubber)
+    co2_scrubber_rating = int(co2_scrubber_rating_str.strip(), base=2)
+    # print(co2_scrubber_rating)
+    print('Life support:', o2_gen_rating * co2_scrubber_rating)
 
 ########################################################
 
 def process():
-    filePath = '/Users/pgore/dev/AOC21/P3/input/input0.txt'
+    filePath = '/Users/pgore/dev/AOC21/P3/input/input1.txt'
     with open(filePath) as fp:
         # process_pc(fp)
         process_ls(fp)
