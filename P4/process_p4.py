@@ -2,6 +2,9 @@
 
 dim = 5
 
+strategy_win = 1
+strategy_lose = 0
+
 class Position:
     def __init__(self, x, y) -> None:
         self.x = x
@@ -9,7 +12,10 @@ class Position:
 
     def __repr__(self) -> str:
         return f'({self.x}, {self.y})'
-
+class WinnerBoard:
+    def __init__(self, board, winning_value) -> None:
+        self.board = board
+        self.winning_value = winning_value
 class BingoBoard:
     def __init__(self, inputs_1d, board_number) -> None:        
         if len(inputs_1d) != (dim * dim):
@@ -37,7 +43,6 @@ class BingoBoard:
         position = self.check_draw(input_draw)
         if position:
             # if found increment row and column
-            # print(f'Found {input_draw} in board {self.board_number} at {position}')
             self.row_tracker[position.x] += 1
             self.col_tracker[position.y] += 1
             self.mark_list[position.x * dim + position.y] = 1
@@ -90,45 +95,44 @@ def get_boards(fp_handle):
 
     return boards
 
-def find_winner_board(boards, draw_numbers):
-    winning_number = None
-    winner_found = False
-    winning_board = None
+
+def find_winner_boards(boards, draw_numbers):
+    winning_boards = []
+    winning_indices = []
     for draw_number in draw_numbers:
         # print(f'Searching number {draw_number}')
         for board in boards:
+            if board.board_number in winning_indices:
+                continue # dont search winning boards anymore
             board.check_and_mark_draw(draw_number)
             if board.is_winner:
-                winner_found = True
-                winning_number = draw_number
-                winning_board = board
-                print(f'Found winner board = {board.board_number}')
-                break
-        if winner_found:
-            break
-    
-    return winning_board, winning_number
+                # print(f'Found winner board = {board.board_number}')
+                winning_boards.append(WinnerBoard(board, draw_number))
+                winning_indices.append(board.board_number)
+    return winning_boards
 
-def get_winner_sum(winner_board):
-    pass
-
-def process_bingo(fp_handle):
+def process_bingo(fp_handle, strategy):
     draw_string = fp_handle.readline()
     draw_numbers = get_draw_numbers(draw_string)       
     boards = get_boards(fp_handle)
     print(f'Found {len(boards)} boards')
-    ########    
-    # boards[0].check_and_mark_draw('16')
-    ########
-
-    winner_board, winning_number = find_winner_board(boards, draw_numbers)
-    win_sum = winner_board.get_win_sum(winning_number)
+    
+    winning_boards = find_winner_boards(boards, draw_numbers)
+    board = None
+    winning_number = None
+    if strategy == strategy_win:
+        # choose first board
+        board = winning_boards[0].board
+        winning_number = winning_boards[0].winning_value
+    else:
+        board = winning_boards[-1].board
+        winning_number = winning_boards[-1].winning_value
+    win_sum = board.get_win_sum(winning_number)  
     print('Win Sum : ', win_sum)
-    # winner_sum = get_winner_sum(winner_board)
 
 def process():
     filePath = '/Users/pgore/dev/AOC21/P4/input/input1.txt'
     with open(filePath) as fp:
-        process_bingo(fp)
+        process_bingo(fp, strategy_lose)
 
 process()
