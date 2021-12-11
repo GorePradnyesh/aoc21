@@ -126,12 +126,16 @@ def process_coords(fp_handle):
     return lines, dim_x, dim_y  
 
 ######
-def process_sparse_image(fp_handle):
+def process_sparse_image(fp_handle, process_diagonal = False):
     lines, dim_x, dim_y = process_coords(fp_handle)
     print(f'Size : {dim_x}, {dim_y}')
 
     sparse_image = SparseImaage()
-    target_lines = [line for line in lines if not line.is_diagonal()]
+    target_lines = None
+    if process_diagonal:
+        target_lines = lines
+    else:
+        target_lines = [line for line in lines if not line.is_diagonal()]
     for line in target_lines:
         walk_line(line, sparse_image)
 
@@ -145,6 +149,6 @@ def process_sparse_image(fp_handle):
 def process():
     filePath = '/Users/pgore/dev/AOC21/P5/input/input1.txt'
     with open(filePath) as fp:
-        process_sparse_image(fp)
+        process_sparse_image(fp, True)
 
 process()
