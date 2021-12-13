@@ -7,7 +7,15 @@ def read_initial_data(fp_handle):
     initial_data = fp_handle.readline()
     return initial_data.split(',')
 
-def calculate_fuel_cost(fp_handle):
+
+def const_cost(position, check_position):
+    return abs(position - check_position)
+
+def progressive_cost(position, check_position):
+    dist = abs(position - check_position)
+    return int((dist * (dist + 1))/2)
+
+def calculate_fuel_cost(fp_handle, cost_calculator):
     # Set up initial data
     initial_data = read_initial_data(fp_handle)
     initial_data = [int(value) for value in initial_data]
@@ -24,7 +32,7 @@ def calculate_fuel_cost(fp_handle):
     min_cost_pos = 0
 
     for check_d in range(low_chec, high_check + 1):
-        cost = sum(abs(value - check_d) for value in initial_data)
+        cost = sum(cost_calculator(value, check_d) for value in initial_data)
         if min_cost == 0 or cost < min_cost:
             min_cost = cost
             min_cost_pos = check_d
@@ -35,6 +43,8 @@ def calculate_fuel_cost(fp_handle):
 def process():
     filePath = '/Users/pgore/dev/AOC21/P7/input/input1.txt'
     with open(filePath) as fp:
-        calculate_fuel_cost(fp)
+        # cost_calculator = const_cost
+        cost_calculator = progressive_cost
+        calculate_fuel_cost(fp, cost_calculator)
 
 process()
