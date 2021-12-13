@@ -1,10 +1,10 @@
 #include <iostream>
 
-#include "include/p8.h"
+#include "include/P8.h"
 
 int main()
 {
     std::cout << "Hello World !\n";
-	printer();
+	processP8();
     return 0;
 }
