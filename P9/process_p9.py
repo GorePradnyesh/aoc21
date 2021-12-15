@@ -12,6 +12,13 @@ class Map:
         if x >= self.width or y >= self.height:
             return None
         return self.oneD_elements[y * self.width + x]   
+    
+    def set_element(self, x, y, value):
+        if x < 0 or y < 0:
+            return None
+        if x >= self.width or y >= self.height:
+            return None
+        self.oneD_elements[y * self.width + x] = value
 
     def is_valid_pos(self, x, y):
         if x < 0 or y < 0:
@@ -41,10 +48,17 @@ def print_map(map):
     for y in range(map.height):
         for x in range(map.width):
             s += str(map.get_element(x,y))
-            s += ' '
+            # s += ''
         s += '\n'
     return s
 
+#currently mutates the map
+def print_basins(map, basin_list):
+    for basin in basin_list:
+        for point in basin:
+            map.set_element(point[0], point[1], '*')
+    map_s = print_map(map)
+    print(map_s)
 
 def get_neighbors(map, x, y, diagonal = False):
     neighbors = []
@@ -102,11 +116,12 @@ def process():
         for point in low_points:
             basin_positions = []
             get_basin(map, point, basin_positions)
-            print(f'value for low point {point} : {len(basin_positions)}' )
+            # print(f'value for low point {point} : {len(basin_positions)}' )
             basin_list.append(basin_positions)
         basin_list.sort(reverse=True, key=lambda x: len(x))
         
         print(f'Final sum : {len(basin_list[0]) * len(basin_list[1]) * len(basin_list[2])}')
         
+        print_basins(map, basin_list)
 
 process()
