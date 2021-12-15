@@ -58,17 +58,25 @@ def process_step(data_map):
 
 ###############
 
-def process():
-    filePath = '/Users/pgore/dev/AOC21/P11/input/input1.txt'
-    step_count = 100
+def process_steps(data_map, step_count):
+    first_flash = None
     flash_count = 0
-    with open(filePath) as fp:
-        data_map = DataUtils.build_map(fp, cast_type=int)
-        for index in range(step_count):
-            flash_count += process_step(data_map)
+    for index in range(step_count):
+            step_flash_count = process_step(data_map)
+            if step_flash_count == len(data_map.oneD_elements) and not first_flash:
+                first_flash = index + 1
+            flash_count += step_flash_count
             # print(f'============= Step {index + 1} ==============')
             # print(DataUtils.get_map_string(data_map, element_separator='', format_width=1))
-        print(f'After {step_count} steps there have been {flash_count} flashes')
-        
+    print(f'After {step_count} steps there have been {flash_count} flashes, first flash: {first_flash}')
+
+def process():
+    filePath = '/Users/pgore/dev/AOC21/P11/input/input1.txt'
+    step_count = 100    
+    with open(filePath) as fp:
+        data_map = DataUtils.build_map(fp, cast_type=int)
+        process_steps(data_map, 100)
+        # pass in 300 to get first flash for input1       
+        # alternatively one could run the process_step until a full flash happens. too lazy now that we know the solution :P 
         
 process()
