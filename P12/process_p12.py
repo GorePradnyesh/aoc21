@@ -48,7 +48,19 @@ def is_small(node):
     return node.islower()
 
 
-def traverse_nodes(data_graph, current_node, end_node, prior_path, final_paths, visited_nodes):    
+def path_has_repeating_small(path, conn):
+    ll = list(element for element in path if (path.count(element) > 1 and element.islower()))
+    return len(ll) > 0
+
+
+def traverse_nodes(
+            data_graph, 
+            current_node, 
+            end_node, 
+            prior_path, 
+            final_paths, 
+            visited_nodes, 
+            extended_search = False):
     current_path = prior_path + [current_node]
     
     if is_end(current_node):
@@ -58,12 +70,16 @@ def traverse_nodes(data_graph, current_node, end_node, prior_path, final_paths, 
     # recruse through the connections, skipping visited nodes 
     connections = data_graph.get_connections(current_node)
     for conn in connections:
-
-        if conn in prior_path and (is_small(conn) or is_start(conn)):
+        if is_start(conn):
             continue
-        else:
-            # add small node to visited list to prevent walking them again            
-            traverse_nodes(data_graph, conn, end_node, current_path.copy(), final_paths, visited_nodes)
+        if is_small(conn):
+            if conn in current_path:
+                if not extended_search:
+                    continue        
+                if extended_search and path_has_repeating_small(current_path, conn):
+                    continue
+        # add small node to visited list to prevent walking them again            
+        traverse_nodes(data_graph, conn, end_node, current_path.copy(), final_paths, visited_nodes, extended_search)
 
 
 
@@ -76,7 +92,7 @@ def build_graph_connections(data_graph, connection_strs):
         data_graph.add_connection(nodes[0], nodes[1])
 
 def process():
-    filePath = '/Users/pgore/dev/AOC21/P12/input/input1.txt' 
+    filePath = '/Users/pgore/dev/AOC21/P12/input/input0.txt' 
     with open(filePath) as fp:
         connections = fp.readlines()
         connections = list(conn.strip() for conn in connections)
@@ -89,10 +105,15 @@ def process():
         final_paths = []
         visited_nodes = []
         path = []
-        traverse_nodes(data_graph, start_node, end_node, path, final_paths, visited_nodes)
+        
+        # pt 1
+        # traverse_nodes(data_graph, start_node, end_node, path, final_paths, visited_nodes, False)
 
-        # for g_path in final_paths:
-        #     print(g_path)
+        # pt 2
+        traverse_nodes(data_graph, start_node, end_node, path, final_paths, visited_nodes, True)
+
+        for g_path in final_paths:
+            print(','.join(g_path))
         print('# of paths ',len(final_paths))
         
 
