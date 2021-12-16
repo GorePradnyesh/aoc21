@@ -2,6 +2,7 @@ import sys
 import os
 import pathlib
 import re
+
 # Add Common to sys path
 sys.path.append(os.path.join(pathlib.Path(__file__).parent.resolve(),'..', 'Common'))
 
@@ -36,12 +37,10 @@ def get_dims(positions):
             max_y = pos[1]
     return max_x, max_y
 
-def process_positions(positions, fold_lines, fold_count):
-    folds = get_folds(fold_lines)    
-    max_x, max_y = get_dims(positions)
+def process_positions(positions, fold_lines):
+    folds = get_folds(fold_lines)        
     # do this for all folds
-    for index in range(fold_count):
-        fold = folds[index]
+    for fold in folds:
         axis_index = 1 if fold.axis == 'y' else 0
         # walk positions
         updated_positions = set()
@@ -57,7 +56,10 @@ def process_positions(positions, fold_lines, fold_count):
                 updated_positions.add(position)
         positions = updated_positions
     return positions
-     
+
+def update_map(data_map, folded_positions):
+    for pos in folded_positions:
+        data_map.set_element(pos[0], pos[1], '#')
 
 def process():
     input_path = os.path.join(pathlib.Path(__file__).parent.resolve(), 'input')    
@@ -72,10 +74,29 @@ def process():
             (int(line.strip().split(',')[0]), int(line.strip().split(',')[1])) # tuple of ints
             for line in data_lines 
             if re.match(reobj, line))
+
+        folded_positions = process_positions(positions, fold_lines.copy())
+        print('Number of dots: ', len(folded_positions))
         
+        max_x, max_y = get_dims(folded_positions)
 
+        width = max_x + 1
+        height = max_y + 1
+        point_data = ['.'] * width * height
+        data_map = DataUtils.DataMap(point_data, width, height)
+        print(DataUtils.get_map_string(data_map, '' ))
+        
+        print(' ')
+        update_map(data_map, folded_positions)
+        print(DataUtils.get_map_string(data_map, '' ))
 
-        folded_positions = process_positions(positions, fold_lines.copy(), 1)
-        print(len(folded_positions))
-
+        # Answer 
+        """
+        ###..####.#..#.###..#..#.###..#..#.###.
+        #..#.#....#..#.#..#.#..#.#..#.#.#..#..#
+        #..#.###..#..#.#..#.#..#.#..#.##...#..#
+        ###..#....#..#.###..#..#.###..#.#..###.
+        #.#..#....#..#.#....#..#.#....#.#..#.#.
+        #..#.####..##..#.....##..#....#..#.#..#
+        """
 process()
