@@ -57,6 +57,13 @@ def get_map_string(map, element_separator = '', format_width = None):
         s += '\n'
     return s
 
+def mutate_map_with_operation(map, operation):
+    for y in range(map.height):
+        for x in range(map.width):
+            element = map.get_element(x,y)
+            operated_val = operation(x, y, element)
+            map.set_element(x, y, operated_val)
+
 ####
 # no diagonals considered
 def get_neighbor_pos(data_map, x, y, diagonal=True):
@@ -65,3 +72,8 @@ def get_neighbor_pos(data_map, x, y, diagonal=True):
         neighbor_pos += [(x - 1, y - 1), (x - 1, y + 1), (x + 1, y - 1), (x + 1, y + 1)]
     neighbor_pos = list(pos for pos in neighbor_pos if data_map.is_valid_pos(pos[0], pos[1])) # remove None elements
     return neighbor_pos
+
+
+####################################################################
+####################################################################
+
