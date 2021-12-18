@@ -89,7 +89,7 @@ def get_path_cost(data_map, cost_map, cur_pos, end_pos, use_caching=True):
         current_min_path = [cur_pos] + min_path
         if use_caching:
             cost_map.set_element(cur_pos.x, cur_pos.y, CachedCost(current_min_cost, current_min_path))
-        # print(f'Caching cost for pos: {cur_pos}')
+        # print(f'Caching cost for pos: {cur_pos}, cost:{current_min_cost}')
 
         # print(f'Min path for f{cur_pos} : f{current_min_path}')
     else:
@@ -122,6 +122,7 @@ def process():
                 return ' '
             return element
 
+        print(f'NOTE: CURRENT ANSWER IS INCORRECT. THIS IS WIP')
         print(f'Total cost w/o start: {total_cost - data_map.get_element(start_pos.x, start_pos.y)}')
         
         DataUtils.mutate_map_with_operation(data_map, replace)
