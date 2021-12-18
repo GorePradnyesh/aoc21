@@ -43,6 +43,10 @@ def build_map(fp, cast_type = None):
         map_elements += list(map_line)
     return DataMap(map_elements, width, height)
 
+
+def build_init_map(width, height, init_value):
+    return DataMap([init_value] * width * height, width, height)
+
 ####
 def get_map_string(map, element_separator = '', format_width = None):
     s = ''

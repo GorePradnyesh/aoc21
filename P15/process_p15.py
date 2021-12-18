@@ -3,6 +3,7 @@ import os
 import pathlib
 import re
 
+
 # Add Common to sys path
 sys.path.append(os.path.join(pathlib.Path(__file__).parent.resolve(),'..', 'Common'))
 
@@ -52,18 +53,33 @@ def get_neighbors(data_map, cur_pos):
     
     return neighbors
 
+## optimization is that dont save the whole path. Save next path object, and follow based on cost
+class CachedCost:
+    def __init__(self, cost:int, path) -> None:
+        self.cost = cost
+        self.path = path
+
+    def __int__(self):
+        return self.cost
+
 ######################
 
-def get_path_cost(data_map, cur_pos, end_pos):
+def get_path_cost(data_map, cost_map, cur_pos, end_pos, use_caching=True):
     if cur_pos == end_pos:
         return data_map.get_element(cur_pos.x, cur_pos.y), [cur_pos]
     
+    # check if this is cached. Avoid running through this
+    if use_caching and cost_map.get_element(cur_pos.x, cur_pos.y) != None:
+        # print(f'Found cached cost and path for node {cur_pos}')
+        cached_pos = cost_map.get_element(cur_pos.x, cur_pos.y)
+        return cached_pos.cost, cached_pos.path
+
     neighbors = get_neighbors(data_map, cur_pos)
     min_cost = sys.maxsize
     min_path = None
     for pos in neighbors:        
-        cost,path = get_path_cost(data_map, pos, end_pos)
-        if cost < min_cost:
+        cost,path = get_path_cost(data_map, cost_map, pos, end_pos, use_caching)
+        if cost <= min_cost:
             min_cost = cost
             min_path = path
     
@@ -71,6 +87,10 @@ def get_path_cost(data_map, cur_pos, end_pos):
         # self cost plus path of downstream min path
         current_min_cost = min_cost + data_map.get_element(cur_pos.x, cur_pos.y)
         current_min_path = [cur_pos] + min_path
+        if use_caching:
+            cost_map.set_element(cur_pos.x, cur_pos.y, CachedCost(current_min_cost, current_min_path))
+        # print(f'Caching cost for pos: {cur_pos}')
+
         # print(f'Min path for f{cur_pos} : f{current_min_path}')
     else:
         print(f'Unexpected. No min path found !')
@@ -85,7 +105,7 @@ def presence_replace(element, presence_list, character):
 #####################
 def process():
     input_path = os.path.join(pathlib.Path(__file__).parent.resolve(), 'input')    
-    filePath = os.path.join(input_path, 'input0.txt')
+    filePath = os.path.join(input_path, 'input1.txt')
 
     with open(filePath) as fp:
         data_map = DataUtils.build_map(fp, cast_type=int)
@@ -94,21 +114,19 @@ def process():
         start_pos = Pos(0,0)
         end_pos = Pos(data_map.width - 1, data_map.height - 1)
 
-        cost = 0
-        path = []
-        total_cost, min_path = get_path_cost(data_map, start_pos, end_pos)
+        cost_map = DataUtils.build_init_map(data_map.width, data_map.height, None)
+        total_cost, min_path = get_path_cost(data_map, cost_map, start_pos, end_pos, use_caching=True)
                 
         def replace(x, y, element):
             if Pos(x, y) in min_path:
-                return '*'
+                return ' '
             return element
 
         print(f'Total cost w/o start: {total_cost - data_map.get_element(start_pos.x, start_pos.y)}')
         
         DataUtils.mutate_map_with_operation(data_map, replace)
         print('---MAP----')
-        print(DataUtils.get_map_string(data_map, ' '))
+        print(DataUtils.get_map_string(data_map, ''))
 
-        
-
+       
 process()
