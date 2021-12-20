@@ -47,6 +47,14 @@ def build_map(fp, cast_type = None):
 def build_init_map(width, height, init_value):
     return DataMap([init_value] * width * height, width, height)
 
+def build_map_with_initializer(width, height, initializer):
+    data_map = DataMap([None] * width * height, width, height)
+    for y in range(data_map.height):
+        for x in range(data_map.width):
+            data_map.set_element(x, y, initializer(x, y))
+    return data_map
+    
+
 ####
 def get_map_string(map, element_separator = '', format_width = None):
     s = ''
