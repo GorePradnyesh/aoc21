@@ -161,7 +161,7 @@ def walk_disjkstra(distance_map, unvisited_list, end_node):
             heapq.heapify(unvisited_list)
 
         current_node.visited = True
-        
+        print(f'{len(unvisited_list)}\r', end='')
         # print(DataUtils.get_map_string(distance_map, ' ', 2) + '\r', end='')
     pass
 
@@ -173,6 +173,30 @@ def process():
         cost_map = DataUtils.build_map(fp, cast_type=int)
         # print(DataUtils.get_map_string(cost_map, ' '))
         
+        should_extend_map = True # P15,Pt 2. False for Pt 1.
+        if should_extend_map:
+            initial_width = cost_map.width
+            initial_height = cost_map.height
+            def extend_map(x, y):
+                increment = int(x / initial_width)
+                increment += int(y / initial_height)
+                inc_x = x % initial_width
+                inc_y = y % initial_height
+                new_value = (cost_map.get_element(inc_x, inc_y) + increment) % 9
+                new_value = new_value if new_value else 9   #(7+1)->8,(8+1)->9,(9+1)->1,(9+2)->2 
+                return new_value if new_value else 1
+
+            
+            # extend cost_map tiles
+            new_width = cost_map.width * 5
+            new_height = cost_map.height * 5
+            extended_map = DataUtils.build_map_with_initializer(
+                new_width,
+                new_height,
+                extend_map)
+            cost_map = extended_map
+            # print(DataUtils.get_map_string(cost_map))
+
         unvisited_list = []
 
         def node_initializer(x, y):
