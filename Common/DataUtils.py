@@ -67,7 +67,7 @@ def get_map_string(map, element_separator = '', format_width = None):
                 s +=  str(map.get_element(x,y))
             s += element_separator
         s += '\n'
-    return s
+    return s.strip()
 
 def mutate_map_with_operation(map, operation):
     for y in range(map.height):

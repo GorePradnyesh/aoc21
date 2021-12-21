@@ -3,6 +3,7 @@ import os
 import pathlib
 import re
 import time
+import heapq
 
 # Add Common to sys path
 sys.path.append(os.path.join(pathlib.Path(__file__).parent.resolve(),'..', 'Common'))
@@ -133,27 +134,40 @@ def walk_disjkstra(distance_map, unvisited_list, end_node):
             print('Visited all neighbors of end node from start')
             return
 
-        current_node = min(unvisited_list)
+        # current_node = min(unvisited_list)
+        current_node = heapq.heappop(unvisited_list)
         current_distance = current_node.distance
 
         if current_distance == sys.maxsize:
             print(f'All remaining nodes are infinitely far away')
             return
 
+        distance_modfied = False
         neighbors = get_unvisited_neighbors(distance_map, current_node)
-        for node in neighbors:
+        for node in neighbors:            
             temp_distance = current_node.distance + node.cost
+            
             if temp_distance < node.distance:
                 node.distance = temp_distance
                 node.prev = current_node
+                distance_modfied = True
+            
+            # if not is not present in the PQ, add it
+            if node not in unvisited_list:
+                heapq.heappush(unvisited_list, node)
         
+        # if node distance has been updated, heapify the PQ 
+        if distance_modfied:
+            heapq.heapify(unvisited_list)
+
         current_node.visited = True
-        unvisited_list.remove(current_node)
+        
+        # print(DataUtils.get_map_string(distance_map, ' ', 2) + '\r', end='')
     pass
 
 def process():
     input_path = os.path.join(pathlib.Path(__file__).parent.resolve(), 'input')    
-    filePath = os.path.join(input_path, 'input0.txt')
+    filePath = os.path.join(input_path, 'input1.txt')
 
     with open(filePath) as fp:
         cost_map = DataUtils.build_map(fp, cast_type=int)
@@ -163,7 +177,6 @@ def process():
 
         def node_initializer(x, y):
             node = Data_Node(x, y, cost_map.get_element(x, y))
-            unvisited_list.append(node)
             return node
 
         distance_map = DataUtils.build_map_with_initializer(
@@ -176,9 +189,14 @@ def process():
         start_node = distance_map.get_element(0 ,0)
         start_node.distance = 0
         start_node.cost = 0
+        
+        heapq.heappush(unvisited_list, start_node)
 
+        st_time = time.perf_counter()
         walk_disjkstra(distance_map, unvisited_list, end_node)
-        print(f'Distance of end node : {end_node.distance}')
+        st_time = time.perf_counter() - st_time
+        
+        print(f'Distance of end node : {end_node.distance}, time: {st_time}')
 
        
 process()
