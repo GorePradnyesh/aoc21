@@ -1,6 +1,7 @@
 import sys
 import os
 import pathlib
+import functools
 
 # Add Common to sys path
 sys.path.append(os.path.join(pathlib.Path(__file__).parent.resolve(),'..', 'Common'))
@@ -16,9 +17,55 @@ literal_digit_len = 5 # 4 + 1 for indication of last group
 
 packet_type_literal = 4
 
+####################
+# Operator helpers 
 
-#####################
+def op_add(iter_l):
+    return sum(iter_l)
 
+def op_mul(iter_l):
+    return functools.reduce(lambda x,y : x*y, iter_l)
+
+def op_min(iter_l):
+    return min(iter_l)
+
+def op_max(iter_l):
+    return max(iter_l)
+
+def op_gt(iter_l):
+    if len(iter_l) != 2:
+        print(f'Exiting. Found incorrect # args for gt. {len(iter_l)}')
+    return 1 if iter_l[0] > iter_l[1] else 0
+
+def op_lt(iter_l):
+    if len(iter_l) != 2:
+        print(f'Exiting. Found incorrect # args for lt. {len(iter_l)}')
+    return 1 if iter_l[0] < iter_l[1] else 0
+
+def op_eq(iter_l):
+    if len(iter_l) != 2:
+        print(f'Exiting. Found incorrect # args for eq. {len(iter_l)}')
+    return 1 if iter_l[0] == iter_l[1] else 0
+
+def get_operator_func(op_type):
+    if op_type == 0:
+        return op_add
+    if op_type == 1:
+        return op_mul
+    if op_type == 2:
+        return op_min
+    if op_type == 3:
+        return op_max
+    if op_type == 5:
+        return op_gt
+    if op_type == 6:
+        return op_lt
+    if op_type == 7:
+        return op_eq
+
+####################
+
+####################
 class Packet:
     def __init__(self, version, type, processed_size) -> None:
         self.version = version
@@ -35,6 +82,9 @@ class LiteralPacket(Packet):
 
     def get_version_sum(self):
         return self.version
+    
+    def evaluate(self):
+        return self.value
 
 
 class OperatorPacket(Packet):
@@ -47,6 +97,7 @@ class OperatorPacket(Packet):
             self.sub_packet_length = 11
         self.packets = packets
         self.packet_size = 3 + 3 + 1 + self.sub_packet_length + processed_size
+        self.op_func = get_operator_func(self.type)
         pass
     
     def __repr__(self) -> str:
@@ -57,6 +108,12 @@ class OperatorPacket(Packet):
         for packet in self.packets:
             version_sum += packet.get_version_sum()
         return version_sum + self.version
+
+    def evaluate(self):
+        eval_list = list(packet.evaluate() for packet in self.packets)
+        return self.op_func(eval_list)
+
+####################
 
 class MutableInput:
     def __init__(self, input) -> None:
@@ -138,6 +195,7 @@ def process_binary(mutable_input):
 
 ####################
 
+
 def hex_to_bin_str(raw_hex_str):
     binary_str = ''
     for hex_char in raw_hex_str:
@@ -155,6 +213,10 @@ def process(input_file_name):
         mutable_input = MutableInput(binary_string)
         packet = process_binary(mutable_input)
 
-    print(f'Sum:{packet.get_version_sum()} for Packet: {packet}, ')
+        print(f'Sum:{packet.get_version_sum()} for Packet: {packet}, ')
+
+        evaluated_val = packet.evaluate()
+        print(f'Evaluation result : {evaluated_val}')
+
     
 process('input1.txt')
