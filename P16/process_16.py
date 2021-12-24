@@ -157,4 +157,4 @@ def process(input_file_name):
 
     print(f'Sum:{packet.get_version_sum()} for Packet: {packet}, ')
     
-process('z3.txt')
+process('input1.txt')
