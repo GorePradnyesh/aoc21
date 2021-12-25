@@ -131,9 +131,12 @@ def process(ta):
     # the highest point for initial velocity 'v_i' is at index 'v_i' 
     print(f'Highest position for max viable velocity:{max_viable_velocity} pos:{get_y_pos(max_viable_velocity, max_viable_velocity)}')
 
+    # NOTE to solve Part 2
+    # Get the lower and upper bounds for x and y ( we already have ub for y)
+    # and solve 
 
 
 ta0 = TA(20,30,-5,-10) # sample
-ta1 = TA(175,227,-79,-134)  # iput
+ta1 = TA(175,227,-79,-134)  # input
 process(ta0)
 
