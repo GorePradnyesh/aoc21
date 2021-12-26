@@ -1,1 +1,9 @@
+# hidden files
 .vscode
+.DS_Store
+
+# native build output
+build/*
+
+# ignore external
+native/external/boost/*
