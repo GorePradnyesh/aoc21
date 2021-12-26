@@ -78,16 +78,19 @@ endif()
 
 # Sources
 file(GLOB SRC CONFIGURE_DEPENDS 
-    native/src/*.cpp)
+    native/src/*.cpp
+    native/src/common/*.cpp
+    P18/*.cpp
+    )
 
 # includes
 file(GLOB INC CONFIGURE_DEPENDS 
     native/include/*.h 
-	native/include/*.hpp)
+    P18/*.h)
 
 # boost src
 file(GLOB BOOST_INC CONFIGURE_DEPENDS
-    native/external/boost/include/*.hppl)
+    native/external/boost/include/*.hpp)
 
 assign_source_group(${SRC})
 assign_source_group(${INC})
@@ -99,7 +102,10 @@ add_executable(AOC21
     ${BOOST_SRC})
 
 # include paths
-target_include_directories(AOC21 PRIVATE native/include native/external/boost/include)
+target_include_directories(AOC21 PRIVATE 
+    native/include
+    P18 
+    native/external/boost/include)
 
 # lib search dir
 target_link_directories(AOC21 PRIVATE ${PROJECT_SOURCE_DIR}/native/external/boost/lib)
