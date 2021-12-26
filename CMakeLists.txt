@@ -85,7 +85,7 @@ file(GLOB SRC CONFIGURE_DEPENDS
 
 # includes
 file(GLOB INC CONFIGURE_DEPENDS 
-    native/include/*.h 
+    native/include/common/*.h 
     P18/*.h)
 
 # boost src
@@ -99,7 +99,7 @@ assign_source_group(${BOOST_INC})
 add_executable(AOC21
     ${SRC} 
     ${INC}
-    ${BOOST_SRC})
+    ${BOOST_INC})
 
 # include paths
 target_include_directories(AOC21 PRIVATE 
