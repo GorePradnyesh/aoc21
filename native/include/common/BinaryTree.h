@@ -61,21 +61,13 @@ bool AddRight(const NodePtr<T>& node, const NodePtr<T>& inOther)
 	return false;
 }
 
-/*
-**
-*/
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const Node<T>& inNode)
-{
-	os << inNode.mData ;
-	return os;
-}
+
 
 /*
 **
 */
-template<typename T>
-void GetNodeStream(const NodePtr<T>& inNode, std::stringstream& ss)
+template<typename T, typename ST>
+void GetNodeStream(const NodePtr<T>& inNode, ST& ss)
 {
 	if(inNode->mData)
 	{
@@ -108,3 +100,12 @@ void PrintNode(const NodePtr<T>& inNode)
 	std::cout << ss.str() << "\n";
 }
 
+/*
+**
+*/
+template <typename T>
+std::ostream& operator<<(std::ostream& os, const NodePtr<T>& inNode)
+{
+	GetNodeStream<int, std::ostream>(inNode, os);
+	return os;
+}

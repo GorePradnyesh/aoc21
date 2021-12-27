@@ -100,8 +100,7 @@ void Process()
 	bool construction_success = ProcessLine(line, rootNode);
 	if(construction_success)
 	{
-		// std::cout << *rootNode << std::endl;
-		PrintNode(rootNode);
+		std::cout << rootNode << std::endl;
 	}
 		
 	// Example Usage
