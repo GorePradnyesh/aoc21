@@ -2,7 +2,7 @@
 **
 **
 */
-
+#pragma once
 #include <iostream>
 #include <memory>
 #include <sstream>
@@ -15,97 +15,45 @@ public:
 	:mData(inData)
 	{}
 	
-	Node(
-		const std::shared_ptr<Node<T>> inLeftNode,
-		const std::shared_ptr<Node<T>> inRightNode,
+	inline bool isLeaf()
+	{
+		return !!mData;
+	}
+
+	static std::shared_ptr<Node<T>> CreateNode(
+		const std::shared_ptr<Node<T>>& inLeftNode,
+		const std::shared_ptr<Node<T>>& inRightNode,
 		const T& inData)
-	:mLeft(inLeftNode),
-	mRight(inRightNode),
-	mData(inData)
+	{
+		std::shared_ptr<Node<T>> newNode
+			= std::shared_ptr<Node<T>>(new Node(inLeftNode, inRightNode, inData));
+		newNode->mLeft->mParent = newNode;	// create weak linkages
+		newNode->mRight->mParent = newNode;	// create weak linkages
+		return newNode;
+	}
+
+private:
+	Node(
+		const std::shared_ptr<Node<T>>& inLeftNode,
+		const std::shared_ptr<Node<T>>& inRightNode,
+		const T& inData)
+	:
+	mData(inData),
+	mLeft(inLeftNode),
+	mRight(inRightNode)
 	{}
 	
-	
+public:
 	T mData;
 	std::shared_ptr<Node<T>> mLeft;
 	std::shared_ptr<Node<T>> mRight;
 	
 	// ?
-	std::shared_ptr<Node<T>> mParent;
+	std::weak_ptr<Node<T>> mParent;
 };
 
 template <typename T>
 using NodePtr = std::shared_ptr<Node<T>>;
 
-template <typename T>
-bool AddLeft(const NodePtr<T>& node, const NodePtr<T>& inOther)
-{
-	if(node->mLeft)
-	{
-		std::cout << "Bad Op. Node already contains left \n";
-		return false;
-	}
-	node->mLeft = inOther;
-	return false;
-}
 
 
-template <typename T>
-bool AddRight(const NodePtr<T>& node, const NodePtr<T>& inOther)
-{
-	if(node->mRight)
-	{
-		std::cout << "Bad Op. Node already contains left \n";
-		return false;
-	}
-	node->mRight = inOther;
-	return false;
-}
-
-
-
-/*
-**
-*/
-template<typename T, typename ST>
-void GetNodeStream(const NodePtr<T>& inNode, ST& ss)
-{
-	if(inNode->mData)
-	{
-		ss << inNode->mData;
-	}
-	else
-	{
-		ss << "[";
-		if(inNode->mLeft)
-		{
-			GetNodeStream(inNode->mLeft, ss);
-			ss << ",";
-		}
-		if(inNode->mRight)
-		{
-			GetNodeStream(inNode->mRight, ss);
-		}
-		ss << "]";
-	}
-}
-
-/*
-**
-*/
-template<typename T>
-void PrintNode(const NodePtr<T>& inNode)
-{
-	std::stringstream ss;
-	GetNodeStream(inNode, ss);
-	std::cout << ss.str() << "\n";
-}
-
-/*
-**
-*/
-template <typename T>
-std::ostream& operator<<(std::ostream& os, const NodePtr<T>& inNode)
-{
-	GetNodeStream<int, std::ostream>(inNode, os);
-	return os;
-}

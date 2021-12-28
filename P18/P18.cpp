@@ -1,4 +1,5 @@
 #include "common/BinaryTree.h"
+#include "common/BinaryTreeOps.h"
 #include <iostream>
 
 #include "common/FileUtils.h"
@@ -44,7 +45,7 @@ namespace
 					auto op1 = node_stack.top(); node_stack.pop();
 					
 					//NOTE the order of operand args to the node/
-					auto nonLeafNode = std::make_shared<Node<int>>(op1, op2, 0);
+					auto nonLeafNode = Node<int>::CreateNode(op1, op2, 0);
 					node_stack.push(nonLeafNode);
 				}
 				paran_stack.pop();
@@ -104,13 +105,13 @@ void Process()
 	}
 		
 	// Example Usage
-	/*
+	
 	NodePtr<int> node_l = std::make_shared<Node<int>>(45);
 	NodePtr<int> node_r = std::make_shared<Node<int>>(46);
-	NodePtr<int> node_root = std::make_shared<Node<int>>(node_l, node_r, 0);
+	// NodePtr<int> node_root = std::make_shared<Node<int>>(node_l, node_r, 0);
 	
-	PrintNode(node_root);
-	*/
+	// PrintNode(node_root);
+	// auto rightSibling = GetLeftmostOfRightChild(node_root, node_l);
 	
 }
 
