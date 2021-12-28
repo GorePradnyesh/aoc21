@@ -31,6 +31,11 @@ public:
 		newNode->mRight->mParent = newNode;	// create weak linkages
 		return newNode;
 	}
+	
+	static std::shared_ptr<Node<T>> CreateNode(const T& inData)
+	{
+		return std::make_shared<Node<T>>(inData);
+	}
 
 private:
 	Node(

@@ -13,24 +13,27 @@
 template<typename T, typename ST>
 void GetNodeStream(const NodePtr<T>& inNode, ST& ss)
 {
-	if(inNode->mData)
+	if(inNode)
 	{
-		ss << inNode->mData;
-	}
-	else
-	{
-		ss << "[";
-		if(inNode->mLeft)
+		if(inNode->mData)
 		{
-			GetNodeStream(inNode->mLeft, ss);
-			ss << ",";
+			ss << inNode->mData;
 		}
-		if(inNode->mRight)
+		else
 		{
-			GetNodeStream(inNode->mRight, ss);
+			ss << "[";
+			if(inNode->mLeft)
+			{
+				GetNodeStream(inNode->mLeft, ss);
+				ss << ",";
+			}
+			if(inNode->mRight)
+			{
+				GetNodeStream(inNode->mRight, ss);
+			}
+			ss << "]";
 		}
-		ss << "]";
-	}
+	} // if inNode
 }
 
 /*
@@ -143,13 +146,42 @@ NodePtr<T> GetRightMostLeaf(const NodePtr<T>& inNode)
 template <typename  T>
 NodePtr<T> GetLeftmostOfRightChild(const NodePtr<T>& inNode, const NodePtr<T>& excludeNode)
 {
-	if(inNode->mRight != excludeNode)
+	NodePtr<T> retNode;
+	if(inNode && excludeNode)
 	{
-		return GetLeftMostLeaf(inNode);
+		if(inNode->mRight != excludeNode)
+		{
+			retNode = GetLeftMostLeaf(inNode->mRight);
+		}
+		else if(inNode->mParent.lock())
+		{
+			retNode = GetLeftmostOfRightChild(inNode->mParent.lock(), inNode);
+		}
 	}
-	else if(inNode->mParent.lock())
+	return retNode;
+}
+
+/*
+**
+*/
+template <typename T>
+NodePtr<T> GetRightSibling(const NodePtr<T>& inNode)
+{
+	NodePtr<T> retNode;
+	if(inNode->isLeaf() && inNode->mParent.lock())
 	{
-		return GetLeftmostOfRightChild(inNode->mParent.lock(), inNode);
+		// node is leaf node with parent
+		retNode = GetLeftmostOfRightChild(inNode->mParent.lock(), inNode);
 	}
-	return NodePtr<T>();
+	return retNode;
+}
+
+/*
+**
+*/
+template <typename T>
+NodePtr<T> GetRightmostOfLeftChild(const NodePtr<T>& inNode, const NodePtr<T>& excludeNode)
+{
+	NodePtr<T> retNode;
+	return retNode;
 }

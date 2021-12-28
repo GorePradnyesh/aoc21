@@ -79,6 +79,74 @@ namespace
 namespace P18
 {
 
+// TODO: use google test really
+void SimpleNavigationTest()
+{
+	// Example Usage
+	
+	NodePtr<int> node_left = std::make_shared<Node<int>>(45);
+	NodePtr<int> node_right = std::make_shared<Node<int>>(46);
+	NodePtr<int> node_root = Node<int>::CreateNode(node_left, node_right, 0);
+	
+	PrintNode(node_root);
+	auto rightSibling = GetLeftmostOfRightChild(node_root, node_left);
+	PrintNode(rightSibling);
+	
+	std::cout << "------------ \n";
+	
+	/*
+	// Tree construction
+	// new line is new level
+	// nodes without children are leaf nodes with valid data values
+							A
+				B						C
+			D		E				F		G
+		H	I		J	K		L	M
+	N	O				P Q
+	*/
+	// leaf nodes
+	auto node_n = Node<int>::CreateNode(10);
+	auto node_o = Node<int>::CreateNode(11);
+	auto node_i = Node<int>::CreateNode(12);
+	auto node_j = Node<int>::CreateNode(13);
+	auto node_p = Node<int>::CreateNode(14);
+	auto node_q = Node<int>::CreateNode(15);
+	auto node_l = Node<int>::CreateNode(16);
+	auto node_m = Node<int>::CreateNode(17);
+	auto node_g = Node<int>::CreateNode(18);
+	
+	// non-leaf
+	auto node_h = Node<int>::CreateNode(node_n, node_o, 0);
+	auto node_d = Node<int>::CreateNode(node_h, node_i, 0);
+	auto node_k = Node<int>::CreateNode(node_p, node_q, 0);
+	auto node_e = Node<int>::CreateNode(node_j, node_k, 0);
+	auto node_b = Node<int>::CreateNode(node_d, node_e, 0);
+	
+	auto node_f = Node<int>::CreateNode(node_l, node_m, 0);
+	auto node_c = Node<int>::CreateNode(node_f, node_g, 0);
+	
+	auto node_a = Node<int>::CreateNode(node_b, node_c, 0);
+	
+	PrintNode(node_a);
+	
+	// get right siblings
+	PrintNode(GetRightSibling(node_n)); // should be node_o, 11
+	PrintNode(GetRightSibling(node_o)); // should be node_i, 12
+	PrintNode(GetRightSibling(node_i)); // should be node_j, 13
+	PrintNode(GetRightSibling(node_j)); // should be node_p, 14
+	PrintNode(GetRightSibling(node_p)); // should be node_q, 15
+	PrintNode(GetRightSibling(node_q)); // should be node_l, 16
+	PrintNode(GetRightSibling(node_l)); // should be node_m, 17
+	PrintNode(GetRightSibling(node_m)); // should be node_g, 18
+	auto retNode = GetRightSibling(node_g); // retNode should be empty
+	;
+	
+	// get left siblings
+	
+	
+	
+}
+
 /**/
 void Process()
 {
@@ -103,15 +171,11 @@ void Process()
 	{
 		std::cout << rootNode << std::endl;
 	}
-		
-	// Example Usage
 	
-	NodePtr<int> node_l = std::make_shared<Node<int>>(45);
-	NodePtr<int> node_r = std::make_shared<Node<int>>(46);
-	// NodePtr<int> node_root = std::make_shared<Node<int>>(node_l, node_r, 0);
+	SimpleNavigationTest();
 	
-	// PrintNode(node_root);
-	// auto rightSibling = GetLeftmostOfRightChild(node_root, node_l);
+	
+	//
 	
 }
 
