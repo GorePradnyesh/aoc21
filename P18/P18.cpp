@@ -139,10 +139,17 @@ void SimpleNavigationTest()
 	PrintNode(GetRightSibling(node_l)); // should be node_m, 17
 	PrintNode(GetRightSibling(node_m)); // should be node_g, 18
 	auto retNode = GetRightSibling(node_g); // retNode should be empty
-	;
 	
+	std::cout << "------ \n";
 	// get left siblings
-	
+	PrintNode(GetLeftSibling(node_g)); // should be node_m, 17
+	PrintNode(GetLeftSibling(node_m)); // should be node_l, 16
+	PrintNode(GetLeftSibling(node_l)); // should be node_q, 15
+	PrintNode(GetLeftSibling(node_q)); // should be node_p, 14
+	PrintNode(GetLeftSibling(node_p)); // should be node_j, 13
+	PrintNode(GetLeftSibling(node_j)); // should be node_i, 12
+	PrintNode(GetLeftSibling(node_i)); // should be node_o, 11
+	PrintNode(GetLeftSibling(node_o)); // should be node_n, 10
 	
 	
 }

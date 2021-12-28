@@ -127,11 +127,11 @@ NodePtr<T> GetRightMostLeaf(const NodePtr<T>& inNode)
 	{
 		retNode = inNode;
 	}
-	else if(inNode->mLeft)
-	{
-		retNode = GetRightMostLeaf(inNode->mLeft);
-	}
 	else if(inNode->mRight)
+	{
+		retNode = GetRightMostLeaf(inNode->mRight);
+	}
+	else if(inNode->mLeft)
 	{
 		retNode = GetRightMostLeaf(inNode->mLeft);
 	}
@@ -177,11 +177,39 @@ NodePtr<T> GetRightSibling(const NodePtr<T>& inNode)
 }
 
 /*
-**
+** Function walks the ancestory recursively to find the rightmost of a left child.
+** if the exclude node is provided then it continues up one level to find the
+** left child of the higher node and if found its right most leaf
 */
 template <typename T>
 NodePtr<T> GetRightmostOfLeftChild(const NodePtr<T>& inNode, const NodePtr<T>& excludeNode)
 {
 	NodePtr<T> retNode;
+	if(inNode && excludeNode)
+	{
+		if(inNode->mLeft != excludeNode)
+		{
+			retNode = GetRightMostLeaf(inNode->mLeft);
+		}
+		else if(inNode->mParent.lock())
+		{
+			retNode = GetRightmostOfLeftChild(inNode->mParent.lock(), inNode);
+		}
+	}
+	return retNode;
+}
+
+/*
+**
+*/
+template <typename T>
+NodePtr<T> GetLeftSibling(const NodePtr<T>& inNode)
+{
+	NodePtr<T> retNode;
+	if(inNode->isLeaf() && inNode->mParent.lock())
+	{
+		// node is leaf node with parent
+		retNode = GetRightmostOfLeftChild(inNode->mParent.lock(), inNode);
+	}
 	return retNode;
 }
