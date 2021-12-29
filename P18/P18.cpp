@@ -171,6 +171,7 @@ void ExplodeTest()
 	// NodePtr<int> rootNode; ProcessLine("[[6,[5,[4,[3,2]]]],1]", rootNode);
 	// NodePtr<int> rootNode; ProcessLine("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]", rootNode);
 	NodePtr<int> rootNode; ProcessLine("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]", rootNode);
+	std::cout << "Before Explode: ";
 	PrintNode(rootNode);
 	
 	auto nodeToExplode = GetFirstToExplode(rootNode);
@@ -178,12 +179,36 @@ void ExplodeTest()
 	{
 		Explode(nodeToExplode);
 	}
-	PrintNode(rootNode);
-	
-	
+	std::cout << "After Explode: ";
+	PrintNode(rootNode);	
 }
 
-/**/
+/*
+**
+*/
+void SplitTest()
+{
+	NodePtr<int> rootNode; ProcessLine("[[[[0,7],4],[7,[[8,4],9]]],[1,1]]", rootNode);
+	std::cout << "Before explode: "; PrintNode(rootNode);
+	
+	auto nodeToExplode = GetFirstToExplode(rootNode);
+	if(nodeToExplode)
+	{
+		Explode(nodeToExplode);
+	}
+	std::cout << "After explode, before split: "; PrintNode(rootNode);
+	
+	auto nodeToSplit = GetFirstToSplit(rootNode);
+	if(nodeToSplit)
+	{
+		Split(nodeToSplit);
+	}
+	std::cout << "After split: "; PrintNode(rootNode);
+}
+
+/*
+**
+*/
 void Process()
 {
 
@@ -200,6 +225,7 @@ void Process()
 	}
 	
 	// Check line processing
+	/*
 	auto line = lines.front();
 	NodePtr<int> rootNode;
 	bool construction_success = ProcessLine(line, rootNode);
@@ -207,10 +233,13 @@ void Process()
 	{
 		std::cout << rootNode << std::endl;
 	}
+	*/
 	
 	//
 	ExplodeTest();
 	
+	//
+	SplitTest();
 }
 
 } // namespace P18

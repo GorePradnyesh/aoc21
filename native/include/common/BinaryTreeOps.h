@@ -4,7 +4,8 @@
 #pragma once
 
 #include "common/BinaryTree.h"
-
+#include <math.h>
+#include <list>
 // =============== Stream Operations ===============
 
 /*
@@ -84,6 +85,30 @@ NodePtr<T> SearchDF(const NodePtr<T>& inNode, UnaryPredicate predicate_op)
 }
 
 /*
+** DFS to find all nodes which satisfy the predicate
+*/
+template <typename T, typename UnaryPredicate>
+void Findall(
+	const NodePtr<T>& inNode,
+	UnaryPredicate predicate_op,
+	std::list<NodePtr<T>>& qualifyingNodes)
+{
+	if(predicate_op(inNode))
+	{
+		qualifyingNodes.push_back(inNode);
+	}
+	if(inNode->mLeft)
+	{
+		Findall(inNode->mLeft, predicate_op, qualifyingNodes);
+	}
+	if(inNode->mRight)
+	{
+		Findall(inNode->mRight, predicate_op, qualifyingNodes);
+	}
+}
+
+
+/*
 **
 */
 template <typename T>
@@ -101,7 +126,20 @@ NodePtr<T> GetFirstToExplode(const NodePtr<T>& inNode)
 	return SearchDF(inNode, depthExceeds);
 }
 
-
+template <typename T>
+NodePtr<T> GetFirstToSplit(const NodePtr<T>& inNode)
+{
+	const std::uint8_t kSplitThreshold = 9;
+	auto depthExceeds = [](const NodePtr<T>& inNode) -> bool
+		{
+			if(inNode->isLeaf())
+			{
+				return (inNode->mData > kSplitThreshold);
+			}
+			return false;
+		};
+	return SearchDF(inNode, depthExceeds);
+}
 
 // =============== Tree Edit Operations ===============
 
@@ -244,29 +282,40 @@ NodePtr<T> Add(const NodePtr<T>& input1, const NodePtr<T>& input2)
 	// Step 1.
 	// Nest the inputs under 1 node
 	auto newNode = Node<T>::CreateNode(input1, input2);
-	
-	//TODO: Check for explode
-	
+		
 	return newNode;
 }
 
+/*
+**
+*/
+template <typename T>
+void ReplaceNode(
+	const NodePtr<T>& inNodeToBeReplaced,
+	const NodePtr<T>& inReplacementNode)
+{
+	auto parentNode = inNodeToBeReplaced->mParent.lock();
+	if(parentNode)
+	{
+		if(parentNode->mRight == inNodeToBeReplaced)
+		{
+			parentNode->mRight = inReplacementNode;
+		}
+		else if(parentNode->mLeft == inNodeToBeReplaced)
+		{
+			parentNode->mLeft = inReplacementNode;
+		}
+	}
+}
 
+/*
+**
+*/
 template <typename T>
 void ReplaceNodeWithZeroLeaf(const NodePtr<T>& inNode)
 {
 	auto zeroLeaf = Node<T>::CreateNode(0);
-	auto parentNode = inNode->mParent.lock();
-	if(parentNode)
-	{
-		if(parentNode->mRight == inNode)
-		{
-			parentNode->mRight = zeroLeaf;
-		}
-		else if(parentNode->mLeft == inNode)
-		{
-			parentNode->mLeft = zeroLeaf;
-		}
-	}
+	ReplaceNode(inNode, zeroLeaf);
 }
 
 /*
@@ -297,4 +346,30 @@ void Explode(const NodePtr<T>& inNode)
 	
 	// Replace with Zero leaf
 	ReplaceNodeWithZeroLeaf(inNode);
+	
+	// Check if split needs to ha
+}
+
+/*
+**
+*/
+template <typename T>
+void Split(const NodePtr<T>& inNode)
+{
+	auto dataValue = inNode->mData;
+	
+	auto nodeDepth = inNode->mDepth;
+	
+	auto leftValue = static_cast<T>(dataValue/2);
+	auto leftNode = Node<T>::CreateNode(leftValue);
+	
+	auto rightValue = static_cast<T>((dataValue+1)/2);
+	auto rightNode = Node<T>::CreateNode(rightValue);
+	
+	auto joinedNode = Node<T>::CreateNode(leftNode, rightNode);
+	ReplaceNode(inNode, joinedNode);
+	
+	// Set the depth of the joined to be the depth of the original leaf
+	// depth of the children of joined nodes will also be incremented
+	joinedNode->SetDepth(nodeDepth);
 }

@@ -21,6 +21,18 @@ public:
 		return mIsLeaf;
 	}
 
+	void SetDepth(std::uint8_t inDepth)
+	{
+		mDepth = inDepth;
+		if(mLeft)
+		{
+			mLeft->SetDepth(inDepth + 1);
+		}
+		if(mRight)
+		{
+			mRight->SetDepth(inDepth + 1);
+		}
+	}
 	
 	void UpdateDepth(std::uint8_t inDepth)
 	{
