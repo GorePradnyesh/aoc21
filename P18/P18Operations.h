@@ -26,6 +26,94 @@ namespace P18
 	**
 	*/
 	template <typename T>
+	NodePtr<T> GetFirstToExplode(const NodePtr<T>& inNode)
+	{
+		const std::uint8_t kExplodeDepthThreshold = 4;
+		auto depthExceeds = [](const NodePtr<T>& inNode) -> bool
+			{
+				if(!inNode->isLeaf())
+				{
+					return inNode->mDepth >= kExplodeDepthThreshold;
+				}
+				return false;
+			};
+		return SearchDF(inNode, depthExceeds);
+	}
+
+	template <typename T>
+	NodePtr<T> GetFirstToSplit(const NodePtr<T>& inNode)
+	{
+		const std::uint8_t kSplitThreshold = 9;
+		auto depthExceeds = [](const NodePtr<T>& inNode) -> bool
+			{
+				if(inNode->isLeaf())
+				{
+					return (inNode->mData > kSplitThreshold);
+				}
+				return false;
+			};
+		return SearchDF(inNode, depthExceeds);
+	}
+
+
+	/*
+	** DFS to find all nodes which satisfy the predicate
+	*/
+	template <typename T, typename UnaryPredicate>
+	void FindAll(
+		const NodePtr<T>& inNode,
+		UnaryPredicate predicate_op,
+		std::list<NodePtr<T>>& qualifyingNodes)
+	{
+		if(predicate_op(inNode))
+		{
+			qualifyingNodes.push_back(inNode);
+		}
+		if(inNode->mLeft)
+		{
+			FindAll(inNode->mLeft, predicate_op, qualifyingNodes);
+		}
+		if(inNode->mRight)
+		{
+			FindAll(inNode->mRight, predicate_op, qualifyingNodes);
+		}
+	}
+
+	template <typename T>
+	void FindAllExplodes(const NodePtr<T>& inNode, NodeList<T>& ioList)
+	{
+		const std::uint8_t kExplodeDepthThreshold = 4;
+		auto depthExceeds = [](const NodePtr<T>& inNode) -> bool
+			{
+				if(!inNode->isLeaf())
+				{
+					return inNode->mDepth >= kExplodeDepthThreshold;
+				}
+				return false;
+			};
+		FindAll(inNode, depthExceeds, ioList);
+	}
+
+	template <typename T>
+	void FindAllSplits(const NodePtr<T>& inNode, NodeList<T> ioList)
+	{
+		const std::uint8_t kSplitThreshold = 9;
+		auto splitCheck = [](const NodePtr<T>& inNode) -> bool
+			{
+				if(inNode->isLeaf())
+				{
+					return (inNode->mData > kSplitThreshold);
+				}
+				return false;
+			};
+		FindAll(inNode, splitCheck, ioList);
+	}
+	
+	
+	/*
+	**
+	*/
+	template <typename T>
 	bool Explode(const NodePtr<T>& inNode)
 	{
 		if(!inNode->mLeft->isLeaf() || !inNode->mRight->isLeaf())
