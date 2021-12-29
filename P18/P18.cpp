@@ -23,7 +23,7 @@ namespace P18
 void Process()
 {
 
-	std::string filePath("/Users/pgore/dev/AOC21/P18/input/input0.txt");
+	std::string filePath("/Users/pgore/dev/AOC21/P18/input/inputz2.txt");
 	FileUtils::FileReaderUPtr fileReader(FileUtils::CreateFileReader(filePath)); // copy elision
 	
 	if(!fileReader)

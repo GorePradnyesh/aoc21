@@ -161,7 +161,15 @@ namespace P18
 	}
 
 	/*
-	**
+	To reduce a tree, you must repeatedly do the first action in this list that applies to the snailfish number:
+
+	- If any pair is nested inside four pairs, the leftmost such pair explodes.
+	- If any regular number is 10 or greater, the leftmost such regular number splits.
+	
+	Once no action in the above list applies, the snailfish number is reduced.
+
+	During reduction, at most one action applies, after which the process returns to the top of the list of actions.
+	For example, if split produces a pair that meets the explode criteria, that pair explodes before other splits occur.
 	*/
 	template <typename T>
 	void Process(const NodePtr<T>& inNode)
@@ -179,12 +187,18 @@ namespace P18
 				didExplode = Explode(explodeNode);
 				std::cout << "After Explode:\t"; PrintNode(inNode);
 			}
-			auto splitNode = GetFirstToSplit(inNode);
-			if(splitNode)
+			
+			// if explode action already takes place, one action cap is reached
+			// move to top of list again
+			if(!didExplode)
 			{
-				Split(splitNode);
-				didSplit = true;
-				std::cout << "After Split:\t"; PrintNode(inNode);
+				auto splitNode = GetFirstToSplit(inNode);
+				if(splitNode)
+				{
+					Split(splitNode);
+					didSplit = true;
+					std::cout << "After Split:\t"; PrintNode(inNode);
+				}
 			}
 			treeChanged = didExplode || didSplit;
 		}while(treeChanged);
