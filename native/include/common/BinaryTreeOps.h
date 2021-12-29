@@ -316,10 +316,11 @@ NodePtr<T> Add(const NodePtr<T>& input1, const NodePtr<T>& input2)
 	// Step 1.
 	// Nest the inputs under 1 node
 	auto newNode = Node<T>::CreateNode(input1, input2);
-		
-	NodeList<T> explodeList;
-	FindAllExplodes(newNode, explodeList);
 	
+	std::cout << "After Addition:\t"; PrintNode(newNode);
+	
+	// Process until no new reductions are found
+	Process(newNode);
 		
 	return newNode;
 }
@@ -434,14 +435,14 @@ void Process(const NodePtr<T>& inNode)
 		{
 			Explode(explodeNode);
 			didExplode = true;
-			std::cout << "After Explode: "; PrintNode(inNode);
+			std::cout << "After Explode:\t"; PrintNode(inNode);
 		}
 		auto splitNode = GetFirstToSplit(inNode);
 		if(splitNode)
 		{
 			Split(splitNode);
 			didSplit = true;
-			std::cout << "After Split: "; PrintNode(inNode);
+			std::cout << "After Split:\t"; PrintNode(inNode);
 		}
 		treeChanged = didExplode || didSplit;
 	}while(treeChanged);
