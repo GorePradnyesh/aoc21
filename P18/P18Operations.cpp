@@ -87,13 +87,12 @@ namespace P18
 		}
 		auto nodeIter = inNodes.begin();
 		finalNode = *nodeIter;
-		PrintNode(finalNode);
 		// point to second node
 		nodeIter++;
 		for(; nodeIter != inNodes.end(); nodeIter++)
 		{
 			finalNode = Add(finalNode, *nodeIter);
-			PrintNode(finalNode);
+			std::cout << "----------------------------------------------\n";
 		}		
 	}
 

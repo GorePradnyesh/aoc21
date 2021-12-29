@@ -23,9 +23,14 @@ namespace P18
 void Process()
 {
 
-	std::string filePath("/Users/pgore/dev/AOC21/P18/input/inputx.txt");
+	std::string filePath("/Users/pgore/dev/AOC21/P18/input/input0.txt");
 	FileUtils::FileReaderUPtr fileReader(FileUtils::CreateFileReader(filePath)); // copy elision
 	
+	if(!fileReader)
+	{
+		std::cout << "Exiting. Invalid file:" << filePath << "\n";
+		return;
+	}
 	
 	std::list<std::string> lines;
 	fileReader->GetLines(lines);
