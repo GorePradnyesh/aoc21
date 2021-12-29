@@ -12,12 +12,13 @@ struct Node
 {
 public:
 	Node(const T& inData)
-	:mData(inData)
+	:mData(inData),
+	mIsLeaf(true)
 	{}
 	
 	inline bool isLeaf()
 	{
-		return !!mData;
+		return mIsLeaf;
 	}
 
 	
@@ -37,11 +38,10 @@ public:
 	// static
 	static std::shared_ptr<Node<T>> CreateNode(
 		const std::shared_ptr<Node<T>>& inLeftNode,
-		const std::shared_ptr<Node<T>>& inRightNode,
-		const T& inData)
+		const std::shared_ptr<Node<T>>& inRightNode)
 	{
 		std::shared_ptr<Node<T>> newNode
-			= std::shared_ptr<Node<T>>(new Node(inLeftNode, inRightNode, inData));
+			= std::shared_ptr<Node<T>>(new Node(inLeftNode, inRightNode));
 		//Create weak parent linkages
 		newNode->mLeft->mParent = newNode;
 		newNode->mRight->mParent = newNode;
@@ -61,12 +61,11 @@ public:
 private:
 	Node(
 		const std::shared_ptr<Node<T>>& inLeftNode,
-		const std::shared_ptr<Node<T>>& inRightNode,
-		const T& inData)
+		const std::shared_ptr<Node<T>>& inRightNode)
 	:
-	mData(inData),
 	mLeft(inLeftNode),
-	mRight(inRightNode)
+	mRight(inRightNode),
+	mIsLeaf(false)
 	{}
 	
 public:
@@ -74,6 +73,7 @@ public:
 	std::shared_ptr<Node<T>> mLeft;
 	std::shared_ptr<Node<T>> mRight;
 	std::uint8_t mDepth { 0 };
+	bool mIsLeaf;
 	// ?
 	std::weak_ptr<Node<T>> mParent;
 };

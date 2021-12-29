@@ -45,7 +45,7 @@ namespace
 					auto op1 = node_stack.top(); node_stack.pop();
 					
 					//NOTE the order of operand args to the node/
-					auto nonLeafNode = Node<int>::CreateNode(op1, op2, 0);
+					auto nonLeafNode = Node<int>::CreateNode(op1, op2);
 					node_stack.push(nonLeafNode);
 				}
 				paran_stack.pop();
@@ -86,7 +86,7 @@ void SimpleNavigationTest()
 	
 	NodePtr<int> node_left = std::make_shared<Node<int>>(45);
 	NodePtr<int> node_right = std::make_shared<Node<int>>(46);
-	NodePtr<int> node_root = Node<int>::CreateNode(node_left, node_right, 0);
+	NodePtr<int> node_root = Node<int>::CreateNode(node_left, node_right);
 	
 	PrintNode(node_root);
 	auto rightSibling = GetLeftmostOfRightChild(node_root, node_left);
@@ -116,16 +116,16 @@ void SimpleNavigationTest()
 	auto node_g = Node<int>::CreateNode(18);
 	
 	// non-leaf
-	auto node_h = Node<int>::CreateNode(node_n, node_o, 0);
-	auto node_d = Node<int>::CreateNode(node_h, node_i, 0);
-	auto node_k = Node<int>::CreateNode(node_p, node_q, 0);
-	auto node_e = Node<int>::CreateNode(node_j, node_k, 0);
-	auto node_b = Node<int>::CreateNode(node_d, node_e, 0);
+	auto node_h = Node<int>::CreateNode(node_n, node_o);
+	auto node_d = Node<int>::CreateNode(node_h, node_i);
+	auto node_k = Node<int>::CreateNode(node_p, node_q);
+	auto node_e = Node<int>::CreateNode(node_j, node_k);
+	auto node_b = Node<int>::CreateNode(node_d, node_e);
 	
-	auto node_f = Node<int>::CreateNode(node_l, node_m, 0);
-	auto node_c = Node<int>::CreateNode(node_f, node_g, 0);
+	auto node_f = Node<int>::CreateNode(node_l, node_m);
+	auto node_c = Node<int>::CreateNode(node_f, node_g);
 	
-	auto node_a = Node<int>::CreateNode(node_b, node_c, 0);
+	auto node_a = Node<int>::CreateNode(node_b, node_c);
 	
 	PrintNode(node_a);
 	
@@ -150,6 +150,35 @@ void SimpleNavigationTest()
 	PrintNode(GetLeftSibling(node_j)); // should be node_i, 12
 	PrintNode(GetLeftSibling(node_i)); // should be node_o, 11
 	PrintNode(GetLeftSibling(node_o)); // should be node_n, 10
+}
+
+void SimpleAddTest()
+{
+	NodePtr<int> input1; ProcessLine("[1,2]", input1);
+	NodePtr<int> input2; ProcessLine("[[3,4],5]", input2);
+	auto resNode = Add(input1, input2);
+	PrintNode(resNode);
+}
+
+/*
+**
+*/
+void ExplodeTest()
+{
+	// NodePtr<int> rootNode; ProcessLine("[1,2]", rootNode);
+	// NodePtr<int> rootNode; ProcessLine("[[[[[9,8],1],2],3],4]", rootNode);
+	// NodePtr<int> rootNode; ProcessLine("[7,[6,[5,[4,[3,2]]]]]", rootNode);
+	// NodePtr<int> rootNode; ProcessLine("[[6,[5,[4,[3,2]]]],1]", rootNode);
+	// NodePtr<int> rootNode; ProcessLine("[[3,[2,[8,0]]],[9,[5,[4,[3,2]]]]]", rootNode);
+	NodePtr<int> rootNode; ProcessLine("[[3,[2,[1,[7,3]]]],[6,[5,[4,[3,2]]]]]", rootNode);
+	PrintNode(rootNode);
+	
+	auto nodeToExplode = GetFirstToExplode(rootNode);
+	if(nodeToExplode)
+	{
+		Explode(nodeToExplode);
+	}
+	PrintNode(rootNode);
 	
 	
 }
@@ -179,10 +208,8 @@ void Process()
 		std::cout << rootNode << std::endl;
 	}
 	
-	SimpleNavigationTest();
-	
-	
 	//
+	ExplodeTest();
 	
 }
 

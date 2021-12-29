@@ -15,7 +15,7 @@ void GetNodeStream(const NodePtr<T>& inNode, ST& ss)
 {
 	if(inNode)
 	{
-		if(inNode->mData)
+		if(inNode->isLeaf())
 		{
 			ss << inNode->mData;
 		}
@@ -57,37 +57,55 @@ std::ostream& operator<<(std::ostream& os, const NodePtr<T>& inNode)
 	return os;
 }
 
+// =============== Tree Search Operations ===============
+
+// Depth First search for first occurrence using provided predicate function
+template <typename T, typename UnaryPredicate>
+NodePtr<T> SearchDF(const NodePtr<T>& inNode, UnaryPredicate predicate_op)
+{
+	// if node matches predicate, return node, else check children
+	NodePtr<T> resNode;
+	if(predicate_op(inNode))
+	{
+		resNode = inNode;
+	}
+	else
+	{
+		if(inNode->mLeft)
+		{
+			resNode = SearchDF(inNode->mLeft, predicate_op);
+		}
+		if(!resNode && inNode->mRight)
+		{
+			resNode = SearchDF(inNode->mRight, predicate_op);
+		}
+	}
+	return resNode;
+}
+
+/*
+**
+*/
+template <typename T>
+NodePtr<T> GetFirstToExplode(const NodePtr<T>& inNode)
+{
+	const std::uint8_t kExplodeDepthThreshold = 4;
+	auto depthExceeds = [](const NodePtr<T>& inNode) -> bool
+		{
+			if(!inNode->isLeaf())
+			{
+				return inNode->mDepth >= kExplodeDepthThreshold;
+			}
+			return false;
+		};
+	return SearchDF(inNode, depthExceeds);
+}
+
+
+
 // =============== Tree Edit Operations ===============
 
-/*
-**
-*/
-template <typename T>
-bool AddLeft(const NodePtr<T>& node, const NodePtr<T>& inOther)
-{
-	if(node->mLeft)
-	{
-		std::cout << "Bad Op. Node already contains left \n";
-		return false;
-	}
-	node->mLeft = inOther;
-	return false;
-}
 
-/*
-**
-*/
-template <typename T>
-bool AddRight(const NodePtr<T>& node, const NodePtr<T>& inOther)
-{
-	if(node->mRight)
-	{
-		std::cout << "Bad Op. Node already contains left \n";
-		return false;
-	}
-	node->mRight = inOther;
-	return false;
-}
 
 // =============== Tree Navigation Operations ===============
 
@@ -212,4 +230,71 @@ NodePtr<T> GetLeftSibling(const NodePtr<T>& inNode)
 		retNode = GetRightmostOfLeftChild(inNode->mParent.lock(), inNode);
 	}
 	return retNode;
+}
+
+
+// =============== Tree Edit Operations ===============
+
+/*
+**
+*/
+template <typename T>
+NodePtr<T> Add(const NodePtr<T>& input1, const NodePtr<T>& input2)
+{
+	// Step 1.
+	// Nest the inputs under 1 node
+	auto newNode = Node<T>::CreateNode(input1, input2);
+	
+	//TODO: Check for explode
+	
+	return newNode;
+}
+
+
+template <typename T>
+void ReplaceNodeWithZeroLeaf(const NodePtr<T>& inNode)
+{
+	auto zeroLeaf = Node<T>::CreateNode(0);
+	auto parentNode = inNode->mParent.lock();
+	if(parentNode)
+	{
+		if(parentNode->mRight == inNode)
+		{
+			parentNode->mRight = zeroLeaf;
+		}
+		else if(parentNode->mLeft == inNode)
+		{
+			parentNode->mLeft = zeroLeaf;
+		}
+	}
+}
+
+/*
+**
+*/
+template <typename T>
+void Explode(const NodePtr<T>& inNode)
+{
+	if(!inNode->mLeft->isLeaf() || !inNode->mRight->isLeaf())
+	{
+		std::cout << "Cannot explode parent of non-leaf nodes\n";
+		return;
+	}
+	
+	NodePtr<T> rightNode = GetRightSibling(inNode->mRight);
+	NodePtr<T> leftNode = GetLeftSibling(inNode->mLeft);
+	
+	if(rightNode)
+	{
+		rightNode->mData += inNode->mRight->mData;
+		// TODO: Needs split ?
+	}
+	if(leftNode)
+	{
+		leftNode->mData += inNode->mLeft->mData;
+		// TODO: Needs split ?
+	}
+	
+	// Replace with Zero leaf
+	ReplaceNodeWithZeroLeaf(inNode);
 }
