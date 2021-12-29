@@ -8,6 +8,9 @@
 #include <list>
 // =============== Stream Operations ===============
 
+template <typename T>
+using NodeList = std::list<NodePtr<T>>;
+
 /*
 **
 */
@@ -84,29 +87,6 @@ NodePtr<T> SearchDF(const NodePtr<T>& inNode, UnaryPredicate predicate_op)
 	return resNode;
 }
 
-/*
-** DFS to find all nodes which satisfy the predicate
-*/
-template <typename T, typename UnaryPredicate>
-void Findall(
-	const NodePtr<T>& inNode,
-	UnaryPredicate predicate_op,
-	std::list<NodePtr<T>>& qualifyingNodes)
-{
-	if(predicate_op(inNode))
-	{
-		qualifyingNodes.push_back(inNode);
-	}
-	if(inNode->mLeft)
-	{
-		Findall(inNode->mLeft, predicate_op, qualifyingNodes);
-	}
-	if(inNode->mRight)
-	{
-		Findall(inNode->mRight, predicate_op, qualifyingNodes);
-	}
-}
-
 
 /*
 **
@@ -139,6 +119,60 @@ NodePtr<T> GetFirstToSplit(const NodePtr<T>& inNode)
 			return false;
 		};
 	return SearchDF(inNode, depthExceeds);
+}
+
+
+/*
+** DFS to find all nodes which satisfy the predicate
+*/
+template <typename T, typename UnaryPredicate>
+void FindAll(
+	const NodePtr<T>& inNode,
+	UnaryPredicate predicate_op,
+	std::list<NodePtr<T>>& qualifyingNodes)
+{
+	if(predicate_op(inNode))
+	{
+		qualifyingNodes.push_back(inNode);
+	}
+	if(inNode->mLeft)
+	{
+		FindAll(inNode->mLeft, predicate_op, qualifyingNodes);
+	}
+	if(inNode->mRight)
+	{
+		FindAll(inNode->mRight, predicate_op, qualifyingNodes);
+	}
+}
+
+template <typename T>
+void FindAllExplodes(const NodePtr<T>& inNode, NodeList<T>& ioList)
+{
+	const std::uint8_t kExplodeDepthThreshold = 4;
+	auto depthExceeds = [](const NodePtr<T>& inNode) -> bool
+		{
+			if(!inNode->isLeaf())
+			{
+				return inNode->mDepth >= kExplodeDepthThreshold;
+			}
+			return false;
+		};
+	FindAll(inNode, depthExceeds, ioList);
+}
+
+template <typename T>
+void FindAllSplits(const NodePtr<T>& inNode, NodeList<T> ioList)
+{
+	const std::uint8_t kSplitThreshold = 9;
+	auto splitCheck = [](const NodePtr<T>& inNode) -> bool
+		{
+			if(inNode->isLeaf())
+			{
+				return (inNode->mData > kSplitThreshold);
+			}
+			return false;
+		};
+	FindAll(inNode, splitCheck, ioList);
 }
 
 // =============== Tree Edit Operations ===============
@@ -283,6 +317,10 @@ NodePtr<T> Add(const NodePtr<T>& input1, const NodePtr<T>& input2)
 	// Nest the inputs under 1 node
 	auto newNode = Node<T>::CreateNode(input1, input2);
 		
+	NodeList<T> explodeList;
+	FindAllExplodes(newNode, explodeList);
+	
+		
 	return newNode;
 }
 
@@ -294,9 +332,15 @@ void ReplaceNode(
 	const NodePtr<T>& inNodeToBeReplaced,
 	const NodePtr<T>& inReplacementNode)
 {
+	auto nodeDepth = inNodeToBeReplaced->mDepth;
+	// Set the depth of the replacement node to be the depth of the original node
+	// depth of the children of replcement nodes will also be set in relation to their parents
+	inReplacementNode->SetDepth(nodeDepth);
+	
 	auto parentNode = inNodeToBeReplaced->mParent.lock();
 	if(parentNode)
 	{
+		// fix the child relationship of parent
 		if(parentNode->mRight == inNodeToBeReplaced)
 		{
 			parentNode->mRight = inReplacementNode;
@@ -305,7 +349,11 @@ void ReplaceNode(
 		{
 			parentNode->mLeft = inReplacementNode;
 		}
+		
+		// establish parent relationship of child
+		inReplacementNode->mParent = parentNode;
 	}
+	
 }
 
 /*
@@ -358,8 +406,6 @@ void Split(const NodePtr<T>& inNode)
 {
 	auto dataValue = inNode->mData;
 	
-	auto nodeDepth = inNode->mDepth;
-	
 	auto leftValue = static_cast<T>(dataValue/2);
 	auto leftNode = Node<T>::CreateNode(leftValue);
 	
@@ -368,8 +414,37 @@ void Split(const NodePtr<T>& inNode)
 	
 	auto joinedNode = Node<T>::CreateNode(leftNode, rightNode);
 	ReplaceNode(inNode, joinedNode);
-	
-	// Set the depth of the joined to be the depth of the original leaf
-	// depth of the children of joined nodes will also be incremented
-	joinedNode->SetDepth(nodeDepth);
 }
+
+/*
+**
+*/
+template <typename T>
+void Process(const NodePtr<T>& inNode)
+{
+	bool treeChanged = false;
+	do
+	{
+		auto explodeNode = GetFirstToExplode(inNode);
+		
+		bool didExplode = false;
+		bool didSplit = false;
+		
+		if(explodeNode)
+		{
+			Explode(explodeNode);
+			didExplode = true;
+			std::cout << "After Explode: "; PrintNode(inNode);
+		}
+		auto splitNode = GetFirstToSplit(inNode);
+		if(splitNode)
+		{
+			Split(splitNode);
+			didSplit = true;
+			std::cout << "After Split: "; PrintNode(inNode);
+		}
+		treeChanged = didExplode || didSplit;
+	}while(treeChanged);
+	// if something changed. Check again
+}
+

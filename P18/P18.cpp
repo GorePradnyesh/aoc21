@@ -206,6 +206,13 @@ void SplitTest()
 	std::cout << "After split: "; PrintNode(rootNode);
 }
 
+void ProcessTest()
+{
+	NodePtr<int> rootNode; ProcessLine("[[[[0,7],4],[7,[[8,4],9]]],[1,1]]", rootNode);
+	std::cout << "initial node: "; PrintNode(rootNode);
+	Process(rootNode);
+}
+
 /*
 **
 */
@@ -236,10 +243,13 @@ void Process()
 	*/
 	
 	//
-	ExplodeTest();
+	// ExplodeTest();
 	
 	//
-	SplitTest();
+	ProcessTest();
+	
+	//
+	// FindAllTest();
 }
 
 } // namespace P18
