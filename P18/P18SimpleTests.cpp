@@ -153,4 +153,11 @@ namespace P18
 		Process(rootNode);
 	}
 	
+	void MagnitudeTest()
+	{
+		NodePtr<int> testNode;				
+		ProcessLine("[[[[8,7],[7,7]],[[8,6],[7,7]]],[[[0,7],[6,6]],[8,7]]]", testNode);
+		std::cout << "Magnitude : " << GetMagnitude(testNode) << "\n"; // should be 3488
+	}
+	
 }	// P18

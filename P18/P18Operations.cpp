@@ -92,7 +92,6 @@ namespace P18
 		for(; nodeIter != inNodes.end(); nodeIter++)
 		{
 			finalNode = Add(finalNode, *nodeIter);
-			std::cout << "----------------------------------------------\n";
 		}		
 	}
 

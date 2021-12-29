@@ -35,4 +35,9 @@ namespace P18
 	**
 	*/
 	void ProcessTest();
+	
+	/*
+	**
+	*/
+	void MagnitudeTest();
 } // P18

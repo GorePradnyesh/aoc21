@@ -7,6 +7,7 @@
 
 #include <vector>
 
+#define PRINT_INTERMEDIATES 0
 
 namespace P18
 {
@@ -185,7 +186,9 @@ namespace P18
 			if(explodeNode)
 			{
 				didExplode = Explode(explodeNode);
-				std::cout << "After Explode:\t"; PrintNode(inNode);
+				#if PRINT_INTERMEDIATES
+					std::cout << "After Explode:\t"; PrintNode(inNode);
+				#endif
 			}
 			
 			// if explode action already takes place, one action cap is reached
@@ -197,7 +200,9 @@ namespace P18
 				{
 					Split(splitNode);
 					didSplit = true;
-					std::cout << "After Split:\t"; PrintNode(inNode);
+					#if PRINT_INTERMEDIATES
+						std::cout << "After Split:\t"; PrintNode(inNode);
+					#endif
 				}
 			}
 			treeChanged = didExplode || didSplit;
@@ -215,11 +220,29 @@ namespace P18
 		// Nest the inputs under 1 node
 		auto newNode = Node<T>::CreateNode(input1, input2);
 		
+		#if PRINT_INTERMEDIATES
 		std::cout << "After Addition:\t"; PrintNode(newNode);
+		#endif
 		
 		// Process until no new reductions are found
 		Process(newNode);
 			
 		return newNode;
+	}
+	
+	/*
+	**
+	*/
+	template <typename T>
+	T GetMagnitude(const NodePtr<T>& inNode)
+	{
+		if(inNode->isLeaf())
+		{
+			return inNode->mData;
+		}
+		else
+		{
+			return 3 * GetMagnitude(inNode->mLeft) + 2 * GetMagnitude(inNode->mRight);
+		}
 	}
 }

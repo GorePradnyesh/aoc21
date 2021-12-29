@@ -22,8 +22,7 @@ namespace P18
 */
 void Process()
 {
-
-	std::string filePath("/Users/pgore/dev/AOC21/P18/input/inputz2.txt");
+	std::string filePath("/Users/pgore/dev/AOC21/P18/input/input0.txt");
 	FileUtils::FileReaderUPtr fileReader(FileUtils::CreateFileReader(filePath)); // copy elision
 	
 	if(!fileReader)
@@ -60,7 +59,7 @@ void Process()
 	NodePtr<int> finalSum;
 	AddListOfNodes(inputNodes, finalSum);
 	std::cout << "Final Sum node:\t"; PrintNode(finalSum);
-	
+	std::cout << "Final Magnitude :" << GetMagnitude(finalSum) << "\n";
 	// AddTest2();
 }
 
