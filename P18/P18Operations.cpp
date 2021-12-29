@@ -1,5 +1,9 @@
+#include "common/BinaryTreeOps.h"
+
 #include "P18Operations.h"
+
 #include <stack>
+#include <vector>
 
 namespace P18
 {
@@ -68,6 +72,29 @@ namespace P18
 			std::cout << "Stack had more than 1 element remaining. Incorrect input. \n";
 			return false;
 		}
+	}
+
+
+	/*
+	**
+	*/
+	void AddListOfNodes(std::vector<NodePtr<int>>& inNodes, NodePtr<int>& finalNode)
+	{
+		if(inNodes.size() == 1)
+		{
+			finalNode = inNodes[0];
+			return;
+		}
+		auto nodeIter = inNodes.begin();
+		finalNode = *nodeIter;
+		PrintNode(finalNode);
+		// point to second node
+		nodeIter++;
+		for(; nodeIter != inNodes.end(); nodeIter++)
+		{
+			finalNode = Add(finalNode, *nodeIter);
+			PrintNode(finalNode);
+		}		
 	}
 
 } // P18

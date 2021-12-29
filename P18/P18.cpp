@@ -23,7 +23,7 @@ namespace P18
 void Process()
 {
 
-	std::string filePath("/Users/pgore/dev/AOC21/P18/input/input0.txt");
+	std::string filePath("/Users/pgore/dev/AOC21/P18/input/inputx.txt");
 	FileUtils::FileReaderUPtr fileReader(FileUtils::CreateFileReader(filePath)); // copy elision
 	
 	
@@ -35,17 +35,28 @@ void Process()
 		return;
 	}
 	
-	// Check line processing
-	/*
-	auto line = lines.front();
-	NodePtr<int> rootNode;
-	bool construction_success = ProcessLine(line, rootNode);
-	if(construction_success)
+	std::vector<NodePtr<int>> inputNodes;
+	inputNodes.reserve(lines.size());
+	
+	for(auto inputLine: lines)
 	{
-		std::cout << rootNode << std::endl;
+		NodePtr<int> inputNode;
+		bool construction_success = ProcessLine(inputLine, inputNode);
+		if(construction_success)
+		{
+			inputNodes.push_back(inputNode);
+		}
+		else
+		{
+			std::cout << "Exiting. Construction Error for line: " << inputLine << "\n";
+		}
 	}
-	*/
-	AddTest2();
+	
+	NodePtr<int> finalSum;
+	AddListOfNodes(inputNodes, finalSum);
+	std::cout << "Final Sum node:\t"; PrintNode(finalSum);
+	
+	// AddTest2();
 }
 
 } // namespace P18
