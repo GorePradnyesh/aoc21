@@ -21,7 +21,10 @@ namespace P18
 	*/
 	void AddListOfNodes(std::vector<NodePtr<int>>& inNodes, NodePtr<int>& finalNode);
 	
-	
+	/*
+	**
+	*/
+	int MaxSum(std::list<std::string>& inInputLines);
 	
 	/*
 	**

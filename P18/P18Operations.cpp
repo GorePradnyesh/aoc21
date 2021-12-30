@@ -19,17 +19,19 @@ namespace P18
 		std::stack<char> paran_stack; // holds '['
 		std::stack<NodePtr<int>> node_stack;
 	
-		std::string::const_iterator it;
-		for(it = inLine.begin(); it != inLine.end(); it++)
+		for(size_t index = 0; index < inLine.size(); index++)
 		{
-			char token = *it;
+			char token = inLine[index];
 			if(token == '[')
 			{
 				paran_stack.push(token);
 			}
 			else if(isdigit(token))
 			{
-				auto value = std::atoi(&token);
+				std::string token_str(&token, 1);
+				// this ensures that we only take a single char.
+				// by ensuring that string is only single char followed by null terminatioon
+				auto value = std::atoi(token_str.c_str());
 				auto node = std::make_shared<Node<int>>(value);
 				node_stack.push(node);
 			}
@@ -93,6 +95,33 @@ namespace P18
 		{
 			finalNode = Add(finalNode, *nodeIter);
 		}		
+	}
+
+	int MaxSum(std::list<std::string>& inInputLines)
+	{
+		int maxMag = 0;
+		for(auto curr_it = inInputLines.begin(); curr_it != inInputLines.end(); curr_it++)
+		{
+			for(auto other_it = inInputLines.begin(); other_it != inInputLines.end(); other_it++)
+			{
+				if(*curr_it == *other_it)
+				{
+					continue; // node cant be added to itself
+				}
+			
+				NodePtr<int> curr_node;
+				ProcessLine(*curr_it, curr_node);
+				NodePtr<int> other_node;
+				ProcessLine(*other_it, other_node);
+				auto sumNode = Add(curr_node, other_node);
+				auto magnitude = GetMagnitude(sumNode);
+				if(magnitude > maxMag)
+				{
+					maxMag = magnitude;
+				}
+			}
+		}
+		return maxMag;
 	}
 
 } // P18

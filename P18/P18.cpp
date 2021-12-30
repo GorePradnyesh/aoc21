@@ -22,7 +22,7 @@ namespace P18
 */
 void Process()
 {
-	std::string filePath("/Users/pgore/dev/AOC21/P18/input/input0.txt");
+	std::string filePath("/Users/pgore/dev/AOC21/P18/input/input1.txt");
 	FileUtils::FileReaderUPtr fileReader(FileUtils::CreateFileReader(filePath)); // copy elision
 	
 	if(!fileReader)
@@ -38,7 +38,7 @@ void Process()
 		std::cout << "Exiting puzzle. Empty file encountered : " << filePath << "\n";
 		return;
 	}
-	
+
 	std::vector<NodePtr<int>> inputNodes;
 	inputNodes.reserve(lines.size());
 	
@@ -56,10 +56,16 @@ void Process()
 		}
 	}
 	
+	std::cout << "---------- Part 1 ----------\n";
 	NodePtr<int> finalSum;
 	AddListOfNodes(inputNodes, finalSum);
 	std::cout << "Final Sum node:\t"; PrintNode(finalSum);
 	std::cout << "Final Magnitude :" << GetMagnitude(finalSum) << "\n";
+
+	std::cout << "---------- Part 2 ----------\n";
+	auto maxMag = MaxSum(lines);
+	std::cout << "Max Magnitude: " << maxMag << "\n";
+
 	// AddTest2();
 }
 
