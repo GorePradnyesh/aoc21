@@ -81,12 +81,15 @@ file(GLOB SRC CONFIGURE_DEPENDS
     native/src/*.cpp
     native/src/common/*.cpp
     P18/*.cpp
+    P20/*.cpp
     )
 
 # includes
 file(GLOB INC CONFIGURE_DEPENDS 
     native/include/common/*.h 
-    P18/*.h)
+    P18/*.h
+    P20/*.h
+    )
 
 # boost src
 file(GLOB BOOST_INC CONFIGURE_DEPENDS
@@ -104,7 +107,8 @@ add_executable(AOC21
 # include paths
 target_include_directories(AOC21 PRIVATE 
     native/include
-    P18 
+    P18
+    P20 
     native/external/boost/include)
 
 # lib search dir

@@ -2,6 +2,7 @@
 
 #include "boost/program_options.hpp"
 #include "P18.h"
+#include "P20.h"
 
 namespace
 {
@@ -12,7 +13,10 @@ namespace
 		switch (inNumber) {
 			case PuzzleNumber::kP_18:
 				P18::Process();
-				
+				break;
+			
+			case PuzzleNumber::kP_20:
+				P20::Process();
 			default:
 				break;
 		}
