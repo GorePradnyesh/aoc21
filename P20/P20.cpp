@@ -104,7 +104,7 @@ DataBuffer2DPtr<std::uint32_t> ProcessLines(const std::list<std::string>& inLine
 	}
 	else
 	{
-		padding = 4;
+		padding = 5;
 	}
 	DataBuffer2DPtr<std::uint32_t> outerBuffer
 		= CreateInitBuffer<std::uint32_t>(lineSize + padding * 2, lineCount + padding * 2, 0);
@@ -163,7 +163,8 @@ void Process()
 	std::cout << "One Count: "  << oneCount << "\n";
 	
 	std::array<std::uint32_t, 9> locals;
-	GetLocalElements(buffer, 8, 8, locals);
+	GetLocalElements(buffer, 7, 7, locals);
+	std::cout << "Index Value: " << GetIndexFromKey(locals) << "\n";
 	std::cout << "Legend Value: " << GetLegendValue(legend, locals) << "\n";
 	
 	
