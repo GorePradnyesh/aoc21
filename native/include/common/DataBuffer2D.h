@@ -35,24 +35,30 @@ public:
 		mDataBuffer[inY * mWidth + inX] = std::forward<const T>(inValue);
 	}
 	
+	std::vector<T>& GetDataHandle()
+	{
+		return mDataBuffer;
+	}
+	
+	const std::uint32_t mWidth;
+	const std::uint32_t mHeight;
+	
 private:
 	/**/
 	DataBuffer2D(
 		std::vector<T>&& inDataBuffer,
 		const std::uint32_t inWidth,
 		const std::uint32_t inHeight)
-	:mDataBuffer(std::forward<std::vector<T>>(inDataBuffer)),
+	:
 	mWidth(inWidth),
-	mHeight(inHeight)
+	mHeight(inHeight),
+	mDataBuffer(std::forward<std::vector<T>>(inDataBuffer))
 	{}
-		
 	
 private:
 	
 	
 	std::vector<T> mDataBuffer;
-	std::uint32_t mWidth;
-	std::uint32_t mHeight;
 	
 	template <typename U>
 	friend std::shared_ptr<DataBuffer2D<U>> CreateBuffer(
@@ -63,6 +69,9 @@ private:
 	
 	template <typename U>
 	friend std::ostream& operator<<(std::ostream& os, const DataBuffer2D<U>& inBuffer);
+	
+	template <typename U, typename ProcOp>
+	friend void ProcessBufferElements(std::shared_ptr<DataBuffer2D<U>>& inBuffer, const ProcOp& unaryOp);
 };
 
 template <typename T>
@@ -88,15 +97,57 @@ DataBuffer2DPtr<T> CreateBuffer(
 		);
 }
 
+/**/
+template <typename T>
+DataBuffer2DPtr<T> CreateInitBuffer(
+	std::uint32_t inWidth,
+	std::uint32_t inHeight,
+	const T& initValue)
+{
+	std::vector<T> initialBuffer(inWidth * inHeight, initValue);
+	return CreateBuffer(std::move(initialBuffer), inWidth, inHeight);
+}
+
+
+
+/**/
+template <typename T, typename ProcOp>
+void ProcessBufferElements(DataBuffer2DPtr<T>& inBuffer, const ProcOp& unaryOp)
+{
+	for(std::uint32_t y = 0; y < inBuffer->mHeight; y++)
+	{
+		for(std::uint32_t x = 0; x < inBuffer->mWidth; x++)
+		{
+			unaryOp(inBuffer->GetDataHandle()[y * inBuffer->mWidth + x]);
+		}
+	}
+}
+
+/**/
+template <typename T, typename ElementOp>
+void PrintProcessedElements(
+	DataBuffer2DPtr<T>& inBuffer,
+	const ElementOp& elementProcOp)
+{
+	for(std::uint32_t y = 0; y < inBuffer->mHeight; y++)
+	{
+		for(std::uint32_t x = 0; x < inBuffer->mWidth; x++)
+		{
+			elementProcOp(std::cout, inBuffer->GetDataHandle()[y * inBuffer->mWidth + x]);
+		}
+		std::cout << "\n";
+	}
+}
+
 /*
 **
 */
 template <typename T>
 std::ostream& operator<<(std::ostream& os, const DataBuffer2D<T>& inBuffer)
 {
-	for(std::uint32_t x = 0; x < inBuffer.mWidth; x++)
+	for(std::uint32_t y = 0; y < inBuffer.mHeight; y++)
 	{
-		for(std::uint32_t y = 0; y < inBuffer.mHeight; y++)
+		for(std::uint32_t x = 0; x < inBuffer.mWidth; x++)
 		{
 			os << inBuffer.mDataBuffer[y * inBuffer.mWidth + x];
 			os << " ";
@@ -105,3 +156,15 @@ std::ostream& operator<<(std::ostream& os, const DataBuffer2D<T>& inBuffer)
 	}
 	return os;
 }
+
+/*
+**
+*/
+template <typename T>
+bool isEdgeElement(const DataBuffer2DPtr<T>& inBuffer, std::uint32_t inX, std::uint32_t inY)
+{
+	return (
+		inX == 0 || inX == (inBuffer->mWidth - 1) ||
+		inY == 0 || (inY == inBuffer->mHeight - 1)) ;
+}
+
