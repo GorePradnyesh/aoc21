@@ -149,26 +149,10 @@ void Process()
 	}
 	auto buffer = ProcessLines(lines);
 	
-	// print formatted buffer
-	auto printProc = [](std::ostream& stream, const std::uint32_t& inValue) -> void
-		{
-			char c = '.';
-			if(inValue == 1)
-			{ c = '#'; }
-			stream << std::setw(1) << c;
-		};
-	PrintProcessedElements(buffer, printProc);
+	PrintFormattedBuffer(buffer);
 
 	// Count number of ones
-	std::uint32_t oneCount = 0;
-	auto oneCounter = [&oneCount](const std::uint32_t& inValue) -> void
-		{
-			if(inValue == 1)
-			{
-				oneCount++;
-			}
-		};
-	ProcessBufferElements(buffer, oneCounter);
+	std::uint32_t oneCount = CountOnes(buffer);	
 	std::cout << "One Count: "  << oneCount << "\n";
 	
 }
