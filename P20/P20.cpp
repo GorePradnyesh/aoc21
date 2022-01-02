@@ -26,17 +26,21 @@ void BasicBufferTest()
 	std::cout << *targetBufferPtr << std::endl;
 }
 
-void OstreamTest(std::ostream& stream, std::uint32_t &inValue, std::uint8_t inWidth)
+void LegendTest()
 {
-	stream << std::setw(inWidth) << inValue << std::endl;
+	std::array<std::uint32_t, 9> arr = {1,1,1,1,1,1,1,1,1};
+	auto val = GetIndexFromKey(arr);
+	std::cout << "Index : " << val << "\n";
 }
+
+
 
 /*
 **
 */
-std::array<std::uint8_t,512> ProcessLegend(const std::string& inString)
+std::array<std::uint32_t,512> ProcessLegend(const std::string& inString)
 {
-	std::array<std::uint8_t, 512> legend;
+	std::array<std::uint32_t, 512> legend;
 	if(inString.size() != 512)
 	{
 		std::cout << "invalid legend size !! ";
@@ -90,6 +94,8 @@ DataBuffer2DPtr<std::uint32_t> ProcessLines(const std::list<std::string>& inLine
 		yIndex++;
 	}
 	
+	std::cout << "Inner Buffer:\n" << *innerBuffer << "\n";
+	
 	// Extend buffer to include additional padding
 	std::uint8_t padding = 0;
 	if(inPadding)
@@ -118,6 +124,7 @@ namespace P20
 */
 void Process()
 {
+	LegendTest();
 
 	// File operation
 	std::string filePath("/Users/pgore/dev/AOC21/P20/input/input0.txt");
@@ -148,12 +155,17 @@ void Process()
 		return;
 	}
 	auto buffer = ProcessLines(lines);
-	
+	std::cout << "Buffer: \n" << *buffer << "\n";
 	PrintFormattedBuffer(buffer);
 
 	// Count number of ones
 	std::uint32_t oneCount = CountOnes(buffer);	
 	std::cout << "One Count: "  << oneCount << "\n";
+	
+	std::array<std::uint32_t, 9> locals;
+	GetLocalElements(buffer, 8, 8, locals);
+	std::cout << "Legend Value: " << GetLegendValue(legend, locals) << "\n";
+	
 	
 }
 

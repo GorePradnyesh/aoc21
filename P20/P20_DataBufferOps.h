@@ -10,7 +10,11 @@
 **
 */
 template <typename T>
-bool GetLocalElements(const DataBuffer2DPtr<T>& inBuffer, std::uint32_t inX, std::uint32_t inY, std::array<T, 9>& outArray)
+bool GetLocalElements(
+	const DataBuffer2DPtr<T>& inBuffer,
+	std::uint32_t inX,
+	std::uint32_t inY,
+	std::array<T, 9>& outArray)
 {
 	if(isEdgeElement(inBuffer, inX, inY))
 	{
@@ -29,6 +33,27 @@ bool GetLocalElements(const DataBuffer2DPtr<T>& inBuffer, std::uint32_t inX, std
 	return true;
 }
 
+/*
+**
+*/
+std::uint32_t GetIndexFromKey(const std::array<std::uint32_t, 9>& inKey)
+{
+	std::uint32_t index = 0;
+	for(int pos = 8; pos >=0; pos--)
+	{
+		index += inKey[pos] * ( 1 << (8 - pos));
+	}
+	return index;
+}
+
+/**/
+std::uint32_t GetLegendValue(
+	const std::array<std::uint32_t, 512>& legend,
+	const std::array<std::uint32_t, 9>& inKey)
+{
+	std::uint32_t index = GetIndexFromKey(inKey);
+	return legend[index];
+}
 
 /*
 **
@@ -48,8 +73,8 @@ void CopyToBuffer(
 		{
 			std::uint32_t fromY = rowIndex;
 			std::uint32_t fromX = colIndex;
-			std::uint32_t toX = (rowIndex + toOffsetY);
-			std::uint32_t toY = (colIndex + toOffsetX);
+			std::uint32_t toY = (rowIndex + toOffsetY);
+			std::uint32_t toX = (colIndex + toOffsetX);
 			toBuffer->SetElement(toX, toY, fromBuffer->GetElement(fromX, fromY));
 		}
 	}
