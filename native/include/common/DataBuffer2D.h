@@ -71,7 +71,7 @@ private:
 	friend std::ostream& operator<<(std::ostream& os, const DataBuffer2D<U>& inBuffer);
 	
 	template <typename U, typename ProcOp>
-	friend void ProcessBufferElements(std::shared_ptr<DataBuffer2D<U>>& inBuffer, const ProcOp& unaryOp);
+	friend void ProcessBufferElements(const std::shared_ptr<DataBuffer2D<U>>& inBuffer, const ProcOp& unaryOp);
 };
 
 template <typename T>
@@ -112,13 +112,13 @@ DataBuffer2DPtr<T> CreateInitBuffer(
 
 /**/
 template <typename T, typename ProcOp>
-void ProcessBufferElements(DataBuffer2DPtr<T>& inBuffer, const ProcOp& unaryOp)
+void ProcessBufferElements(const DataBuffer2DPtr<T>& inBuffer, const ProcOp& unaryOp)
 {
 	for(std::uint32_t y = 0; y < inBuffer->mHeight; y++)
 	{
 		for(std::uint32_t x = 0; x < inBuffer->mWidth; x++)
 		{
-			unaryOp(inBuffer->GetDataHandle()[y * inBuffer->mWidth + x]);
+			unaryOp(x, y, inBuffer->GetDataHandle()[y * inBuffer->mWidth + x]);
 		}
 	}
 }
@@ -126,7 +126,7 @@ void ProcessBufferElements(DataBuffer2DPtr<T>& inBuffer, const ProcOp& unaryOp)
 /**/
 template <typename T, typename ElementOp>
 void PrintProcessedElements(
-	DataBuffer2DPtr<T>& inBuffer,
+	const DataBuffer2DPtr<T>& inBuffer,
 	const ElementOp& elementProcOp)
 {
 	for(std::uint32_t y = 0; y < inBuffer->mHeight; y++)

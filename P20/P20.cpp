@@ -70,7 +70,9 @@ std::array<std::uint32_t,512> ProcessLegend(const std::string& inString)
 /*
 **
 */
-DataBuffer2DPtr<std::uint32_t> ProcessLines(const std::list<std::string>& inLines, std::uint8_t inPadding = 0)
+DataBuffer2DPtr<std::uint32_t> ProcessLines(
+	const std::list<std::string>& inLines,
+	std::uint8_t inPadding)
 {
 	//Get Buffer
 	size_t lineSize = inLines.front().size();
@@ -94,24 +96,14 @@ DataBuffer2DPtr<std::uint32_t> ProcessLines(const std::list<std::string>& inLine
 		yIndex++;
 	}
 	
-	std::cout << "Inner Buffer:\n" << *innerBuffer << "\n";
-	
 	// Extend buffer to include additional padding
-	std::uint8_t padding = 0;
-	if(inPadding)
-	{
-		padding = inPadding;
-	}
-	else
-	{
-		padding = 5;
-	}
 	DataBuffer2DPtr<std::uint32_t> outerBuffer
-		= CreateInitBuffer<std::uint32_t>(lineSize + padding * 2, lineCount + padding * 2, 0);
+		= CreateInitBuffer<std::uint32_t>(lineSize + inPadding * 2, lineCount + inPadding * 2, 0);
 	// to copy inner to center of outer buffer, the offsets are the same as padding
-	CopyToBuffer(innerBuffer, outerBuffer, padding, padding);
+	CopyToBuffer(innerBuffer, outerBuffer, inPadding, inPadding);
 	return outerBuffer;
 }
+
 
 
 }	// unnamed
@@ -124,7 +116,6 @@ namespace P20
 */
 void Process()
 {
-	LegendTest();
 
 	// File operation
 	std::string filePath("/Users/pgore/dev/AOC21/P20/input/input0.txt");
@@ -144,7 +135,9 @@ void Process()
 		return;
 	}
 	
-	//Process input
+	std::uint32_t iterations = 2;
+	
+	//Process input tp legend
 	auto legend_str = lines.front(); lines.pop_front();
 	auto legend = ProcessLegend(legend_str);
 	
@@ -154,19 +147,14 @@ void Process()
 		std::cout <<"Exiting. Invalid input.\n";
 		return;
 	}
-	auto buffer = ProcessLines(lines);
-	std::cout << "Buffer: \n" << *buffer << "\n";
-	PrintFormattedBuffer(buffer);
-
-	// Count number of ones
-	std::uint32_t oneCount = CountOnes(buffer);	
-	std::cout << "One Count: "  << oneCount << "\n";
 	
-	std::array<std::uint32_t, 9> locals;
-	GetLocalElements(buffer, 7, 7, locals);
-	std::cout << "Index Value: " << GetIndexFromKey(locals) << "\n";
-	std::cout << "Legend Value: " << GetLegendValue(legend, locals) << "\n";
+	std::uint32_t padding = 5;
+	auto buffer = ProcessLines(lines, padding);
+	std::cout << "Buffer Size: " << buffer->mWidth << " x " << buffer->mHeight << "\n";
 	
+	// Iterate over buffer
+	IterateOverBuffer(buffer, legend, iterations, padding);
+	std::cout << "Final Count of ones: "  << CountOnes(buffer) << "\n";
 	
 }
 

@@ -6,6 +6,8 @@
 #include "common/DataBuffer2D.h"
 #include <utility>
 #include <iostream>
+
+#define PRINT_FORMATTED_BUFFERS 1
 /*
 **
 */
@@ -55,6 +57,27 @@ std::uint32_t GetLegendValue(
 	return legend[index];
 }
 
+/**/
+std::uint32_t GetConsultedValue(
+	const DataBuffer2DPtr<std::uint32_t>& inBuffer,
+	const std::array<std::uint32_t, 512> inLegend,
+	std::uint32_t inX,
+	std::uint32_t inY)
+{
+	//TODO: reallocation of this stack memory for each element is expensive.
+	std::array<std::uint32_t, 9> locals;
+	
+	// Edge elements will always have 0 value, since
+	// they are outside the immediate consultation zone.
+	if(isEdgeElement(inBuffer, inX, inY))
+	{
+		return 0;
+	}
+	
+	GetLocalElements(inBuffer, inX, inY, locals);
+	return GetLegendValue(inLegend, locals);
+}
+
 /*
 **
 */
@@ -81,7 +104,7 @@ void CopyToBuffer(
 }
 
 /**/
-void PrintFormattedBuffer(DataBuffer2DPtr<std::uint32_t>& inBuffer)
+void PrintFormattedBuffer(const DataBuffer2DPtr<std::uint32_t>& inBuffer)
 {
 	// print formatted buffer
 	auto printProc = [](std::ostream& stream, const std::uint32_t& inValue) -> void
@@ -98,7 +121,10 @@ void PrintFormattedBuffer(DataBuffer2DPtr<std::uint32_t>& inBuffer)
 std::uint32_t CountOnes(DataBuffer2DPtr<std::uint32_t>& inBuffer)
 {
 	std::uint32_t oneCount = 0;
-	auto oneCounter = [&oneCount](const std::uint32_t& inValue) -> void
+	auto oneCounter = [&oneCount](
+							std::uint32_t inX,
+							std::uint32_t inY,
+							const std::uint32_t& inValue) -> void
 		{
 			if(inValue == 1)
 			{
@@ -107,4 +133,46 @@ std::uint32_t CountOnes(DataBuffer2DPtr<std::uint32_t>& inBuffer)
 		};
 	ProcessBufferElements(inBuffer, oneCounter);
 	return oneCount;
+}
+
+
+/**/
+void IterateOverBuffer(
+	const DataBuffer2DPtr<std::uint32_t>& inBuffer,
+	const std::array<std::uint32_t, 512>& inLegend,
+	std::uint32_t iterCount,
+	std::uint32_t inPadding)
+{
+	#if PRINT_FORMATTED_BUFFERS
+		std::cout << "---\n Before Iteration Processed Vector:\n";
+		PrintFormattedBuffer(inBuffer);
+	#endif
+	
+	std::vector<std::uint32_t>& vectorHandle = inBuffer->GetDataHandle();
+	auto bufferWidth = inBuffer->mWidth;
+	
+	// create swap vector the same size as the one held by buffer and zeroFill
+	std::vector<uint32_t> swapVector(vectorHandle.size(), 0);
+	
+	// process iteratively
+	for(std::uint32_t iter = 0; iter < iterCount; iter++)
+	{
+		auto processLocals
+			= [&inBuffer, &inLegend, &swapVector, bufferWidth](
+				std::uint32_t inX,
+				std::uint32_t inY,
+				const uint32_t inElement)->void
+			{
+				auto val = GetConsultedValue(inBuffer, inLegend, inX, inY);
+				swapVector[inY * bufferWidth + inX] = val;
+				
+			};
+		ProcessBufferElements(inBuffer, processLocals);
+		std::swap(vectorHandle, swapVector);
+		
+		#if PRINT_FORMATTED_BUFFERS
+			std::cout << "---\n After Iteration #" << iter << " , Processed Vector:\n";
+			PrintFormattedBuffer(inBuffer);
+		#endif
+	}
 }
