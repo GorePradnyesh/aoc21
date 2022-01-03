@@ -118,7 +118,7 @@ void Process()
 {
 
 	// File operation
-	std::string filePath("/Users/pgore/dev/AOC21/P20/input/input0.txt");
+	std::string filePath("/Users/pgore/dev/AOC21/P20/input/input1.txt");
 	FileUtils::FileReaderUPtr fileReader(FileUtils::CreateFileReader(filePath)); // copy elision
 	
 	if(!fileReader)

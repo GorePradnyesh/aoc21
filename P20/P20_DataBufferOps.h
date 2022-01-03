@@ -162,23 +162,24 @@ void IterateOverBuffer(
 	for(std::uint32_t iter = 0; iter < iterCount; iter++)
 	{
 		auto processLocals
-			= [&inBuffer, &inLegend, &swapVector, &iter, bufferWidth, bufferHeight, inPadding]
+			= [&inBuffer, &inLegend, &swapVector, bufferWidth]
 				(std::uint32_t inX,
 				std::uint32_t inY,
 				const uint32_t inElement)->void
 			{
 				std::uint32_t val;
-				// only work in the target area
-				// target area gets bigger with every iteration ( deduction gets smaller )
-				// we have to ensure that padding > (number of iterations + 1).
-				std::uint32_t deduction = inPadding - (iter + 1);
-				if(inX < (deduction) || inY < (deduction))
+				// Reasoning for the conditional below:
+				// The infinite pixels will flip flop based on the legend.
+				// so they will be either all 0's or all one's, so we check index 0 and 511
+				// TODO: the logic could be further improved to not hard code the flip flop, but rather determine action based on legend
+				if(isEdgeElement(inBuffer, inX, inY))
 				{
-					val = 0;
-				}
-				else if(inX >= (bufferWidth - deduction) || inY >= (bufferHeight - deduction))
-				{
-					val = 0;
+					std::uint32_t index = 0;
+					if(inBuffer->GetElement(inX, inY))
+					{
+						index = 511;
+					}
+					val = inLegend[index];
 				}
 				else
 				{
