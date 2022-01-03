@@ -135,7 +135,7 @@ void Process()
 		return;
 	}
 	
-	std::uint32_t iterations = 2;
+	std::uint32_t iterations = 50;
 	
 	//Process input tp legend
 	auto legend_str = lines.front(); lines.pop_front();
@@ -148,7 +148,7 @@ void Process()
 		return;
 	}
 	
-	std::uint32_t padding = 5;
+	std::uint32_t padding = iterations + 2;
 	auto buffer = ProcessLines(lines, padding);
 	std::cout << "Buffer Size: " << buffer->mWidth << " x " << buffer->mHeight << "\n";
 	
