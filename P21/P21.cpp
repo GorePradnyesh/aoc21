@@ -16,7 +16,7 @@ namespace
 {
 	void RollTest()
 	{
-		DiePtr die = std::make_shared<DeterministicDie>();
+		DiePtr die = std::make_shared<DeterministicDie>(100);
 		std::uint32_t rollCount = 50;
 		for(std::uint32_t rollNum = 0; rollNum < rollCount; rollNum++)
 		{
@@ -56,10 +56,11 @@ namespace
 	void RunGame()
 	{
 		constexpr std::uint32_t playerCount = 2;
-		DiePtr gameDie = std::make_shared<DeterministicDie>();
+		constexpr std::uint32_t dieSides = 100;
+		DiePtr gameDie = std::make_shared<DeterministicDie>(dieSides);
 		constexpr std::uint32_t spaceCount = 10;	// circular board
 		
-		std::array<PlayerPtr, playerCount> players { std::make_shared<Player>(4), std::make_shared<Player>(8) };
+		std::array<PlayerPtr, playerCount> players { std::make_shared<Player>(9), std::make_shared<Player>(4) };
 		
 		std::uint32_t turnCount { 0 };
 		std::uint32_t winningPlayer = 0;
@@ -96,7 +97,7 @@ namespace
 		std::uint32_t losingPlayerNumber = (winningPlayer + 1) % playerCount;
 		std::cout << "Losing player score " << players[losingPlayerNumber]->mScore << "\n";
 		std::cout << "Die Roll:  " << gameDie->GetRollCount() << "\n";
-		std::cout << "Final Valu :  " << players[losingPlayerNumber]->mScore * gameDie->GetRollCount() << "\n";
+		std::cout << "Final Value :  " << players[losingPlayerNumber]->mScore * gameDie->GetRollCount() << "\n";
 		
 		
 	}

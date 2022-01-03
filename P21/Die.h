@@ -35,7 +35,9 @@ class DeterministicDie: public Die
 {
 public:
 	
-	DeterministicDie() = default;
+	DeterministicDie(std::uint32_t inSides)
+	:maxGen(inSides)
+	{}
 
 protected:
 	
@@ -48,5 +50,5 @@ protected:
 	
 private:
 	std::uint32_t mCurrentGenCount { 1 };
-	const std::uint32_t maxGen { 100 };
+	std::uint32_t maxGen { 0 };
 };
