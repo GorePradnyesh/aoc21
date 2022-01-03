@@ -150,20 +150,40 @@ void IterateOverBuffer(
 	
 	std::vector<std::uint32_t>& vectorHandle = inBuffer->GetDataHandle();
 	auto bufferWidth = inBuffer->mWidth;
+	auto bufferHeight = inBuffer->mHeight;
 	
 	// create swap vector the same size as the one held by buffer and zeroFill
 	std::vector<uint32_t> swapVector(vectorHandle.size(), 0);
 	
-	// process iteratively
+	// compute bounds of target region. This
+	
+	
+	// process iteratively over the dynamic target region
 	for(std::uint32_t iter = 0; iter < iterCount; iter++)
 	{
 		auto processLocals
-			= [&inBuffer, &inLegend, &swapVector, bufferWidth](
-				std::uint32_t inX,
+			= [&inBuffer, &inLegend, &swapVector, &iter, bufferWidth, bufferHeight, inPadding]
+				(std::uint32_t inX,
 				std::uint32_t inY,
 				const uint32_t inElement)->void
 			{
-				auto val = GetConsultedValue(inBuffer, inLegend, inX, inY);
+				std::uint32_t val;
+				// only work in the target area
+				// target area gets bigger with every iteration ( deduction gets smaller )
+				// we have to ensure that padding > (number of iterations + 1).
+				std::uint32_t deduction = inPadding - (iter + 1);
+				if(inX < (deduction) || inY < (deduction))
+				{
+					val = 0;
+				}
+				else if(inX >= (bufferWidth - deduction) || inY >= (bufferHeight - deduction))
+				{
+					val = 0;
+				}
+				else
+				{
+					val = GetConsultedValue(inBuffer, inLegend, inX, inY);
+				}
 				swapVector[inY * bufferWidth + inX] = val;
 				
 			};
