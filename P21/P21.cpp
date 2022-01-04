@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <thread>
+#define PRINT_PLAYER_MOVES 0
 
 namespace
 {
@@ -80,11 +81,13 @@ namespace
 			currentPlayer->mCurrentPos = GetNextPos(rollCount, currentPlayer->mCurrentPos, spaceCount);
 			currentPlayer->mScore += currentPlayer->mCurrentPos;
 			
-			std::cout << "Player #" << playerNumber
-				<< " rolled: " << rollCount
-				<< ", moves to pos: " << currentPlayer->mCurrentPos
-				<< ", total score: " << currentPlayer->mScore
-				<< "\n";
+			#if PRINT_PLAYER_MOVES
+				std::cout << "Player #" << playerNumber
+					<< " rolled: " << rollCount
+					<< ", moves to pos: " << currentPlayer->mCurrentPos
+					<< ", total score: " << currentPlayer->mScore
+					<< "\n";
+			#endif
 			turnCount++;
 			
 			if(currentPlayer->mScore >= 1000)
@@ -98,8 +101,12 @@ namespace
 		std::cout << "Losing player score " << players[losingPlayerNumber]->mScore << "\n";
 		std::cout << "Die Roll:  " << gameDie->GetRollCount() << "\n";
 		std::cout << "Final Value :  " << players[losingPlayerNumber]->mScore * gameDie->GetRollCount() << "\n";
-		
-		
+	} // RunGame
+	
+	/**/
+	void RunQuantumGame()
+	{
+		// TODO: implement quantum Game run.
 	}
 
 } // unnamed
@@ -109,9 +116,9 @@ namespace P21
 /**/
 void Process()
 {
-	// RollTest();
 	RunGame();
-	std::cout << std::endl;
+	
+	RunQuantumGame();
 }
 
 } // namespace P21
