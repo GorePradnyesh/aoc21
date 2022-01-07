@@ -83,6 +83,7 @@ file(GLOB SRC CONFIGURE_DEPENDS
     P18/*.cpp
     P20/*.cpp
     P21/*.cpp
+    P22/*.cpp
     )
 
 # includes
@@ -91,6 +92,7 @@ file(GLOB INC CONFIGURE_DEPENDS
     P18/*.h
     P20/*.h
     P21/*.h
+    P22/*.h
     )
 
 # boost src
@@ -112,6 +114,7 @@ target_include_directories(AOC21 PRIVATE
     P18
     P20
     P21 
+    P22
     native/external/boost/include)
 
 # lib search dir

@@ -4,10 +4,11 @@
 #include "P18.h"
 #include "P20.h"
 #include "P21.h"
+#include "P22.h"
 
 namespace
 {
-	enum class PuzzleNumber{kP_18 = 18, kP_19, kP_20, kP_21};
+	enum class PuzzleNumber{kP_18 = 18, kP_19, kP_20, kP_21, kP_22};
 
 	void invokePuzzle(PuzzleNumber inNumber)
 	{
@@ -23,7 +24,11 @@ namespace
 			case PuzzleNumber::kP_21:
 				P21::Process();
 				break;
-				
+			
+			case PuzzleNumber::kP_22:
+				P22::Process();
+				break;
+			
 			default:
 				break;
 		}
