@@ -6,6 +6,7 @@
 #include "P22.h"
 #include "P22_Operations.h"
 #include "SpaceOperations.h"
+#include "TestSpaceOperations.h"
 
 namespace P22
 {
@@ -13,7 +14,7 @@ namespace P22
 /*
 **
 */
-void Process()
+void ProcessInner()
 {
 	// File operation
 	std::string filePath("/Users/pgore/dev/AOC21/P22/input/input0.txt");
@@ -40,6 +41,14 @@ void Process()
 	{
 		std::cout << step << "\n";
 	}
-} // Process
+} // ProcessInner
+
+/**/
+void Process()
+{
+	TestPlaneOverlap();
+	
+	// ProcessInner();
+}
 
 } // P22
