@@ -5,39 +5,48 @@
 
 #include <iostream>
 #include <regex>
+#include <map>
 
+#include "SpaceOperations.h"
 
 namespace P22
 {
 
 enum class RebootState {k_on, k_off};
 
-/**/
-struct Coord
-{
-	std::int32_t x;
-	std::int32_t y;
-	std::int32_t z;
-};
-
 
 /**/
 std::ostream& operator<<(std::ostream& os, RebootState rs)
 {
 	if(rs == RebootState::k_on)
-	{
-		os << "on";
-	}
+	{ os << "on"; }
 	else
-	{
-		os << "off";
-	}
+	{ os << "off"; }
 	return os;
 }
 
 /**/
-struct RebootStep
+class RebootStep
 {
+public:
+	RebootStep(
+		RebootState inState,
+		std::int32_t inXLow,
+		std::int32_t inXHigh,
+		std::int32_t inYLow,
+		std::int32_t inYHigh,
+		std::int32_t inZLow,
+		std::int32_t inZHigh)
+		:
+		mState(inState),
+		mXLow(inXLow),
+		mXHigh(inXHigh),
+		mYLow(inYLow),
+		mYHigh(inYHigh),
+		mZLow(inZLow),
+		mZHigh(inZHigh)
+	{}
+
 	RebootState mState;
 	
 	std::int32_t mXLow { 0 };
@@ -48,14 +57,6 @@ struct RebootStep
 	std::int32_t mZHigh { 0 };
 };
 
-
-/**/
-void GetCoordsFromStep(
-	const std::list<RebootStep>& inSteps,
-	std::list<Coord>& outCoords)
-{
-	//
-}
 
 
 /**/
@@ -71,14 +72,14 @@ void ProcessLines(
 		if(std::regex_search(line.begin(), line.end(), match, rgx))
 		{
 			RebootState state = !std::string("on").compare(match[1]) ? RebootState::k_on : RebootState::k_off;
-			RebootStep step {
+			RebootStep step(
 				state,
 				std::stoi(match[2]),
 				std::stoi(match[3]),
 				std::stoi(match[4]),
 				std::stoi(match[5]),
 				std::stoi(match[6]),
-				std::stoi(match[7])};
+				std::stoi(match[7]));
 			outSteps.push_back(step);
 		}
 	}
@@ -93,6 +94,4 @@ std::ostream& operator<<(std::ostream& os, RebootStep step)
 		<< ",z=" << step.mZLow << ".." <<  step.mZHigh;
 	return os;
 }
-
-
 } // P22

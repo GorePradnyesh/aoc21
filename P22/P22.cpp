@@ -5,6 +5,7 @@
 
 #include "P22.h"
 #include "P22_Operations.h"
+#include "SpaceOperations.h"
 
 namespace P22
 {
@@ -15,7 +16,7 @@ namespace P22
 void Process()
 {
 	// File operation
-	std::string filePath("/Users/pgore/dev/AOC21/P22/input/inputx.txt");
+	std::string filePath("/Users/pgore/dev/AOC21/P22/input/input0.txt");
 	FileUtils::FileReaderUPtr fileReader(FileUtils::CreateFileReader(filePath)); // copy elision
 	
 	if(!fileReader)
