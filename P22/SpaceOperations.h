@@ -77,75 +77,89 @@ inline bool ValueContainedIn(
 
 
 /**/
-inline IntersectPoint DimOverlap(
+bool DimOverlap(
 	std::int32_t inMinOne,
 	std::int32_t inMaxOne,
 	std::int32_t inMinTwo,
-	std::int32_t inMaxTwo)
+	std::int32_t inMaxTwo,
+	IntersectPoint& outIntersectPoint)
 {
 	// one is contained within two
 	if(inMinOne >= inMinTwo && inMaxOne <= inMaxTwo)
 	{
-		return IntersectPoint {inMinOne, inMaxOne};
+		outIntersectPoint = {inMinOne, inMaxOne};
+		return true;
 	}
 	
 	// two is contained within one
 	if(inMinOne <= inMinTwo && inMaxOne >= inMaxTwo)
 	{
-		return IntersectPoint {inMinTwo, inMaxTwo};
+		outIntersectPoint = {inMinTwo, inMaxTwo};
+		return true;
 	}
 	
 	// min One is between the planes of two
 	if(inMinOne >= inMinTwo && inMinOne <= inMaxTwo)
 	{
-		return IntersectPoint {inMinOne, inMaxTwo};
+		outIntersectPoint = {inMinOne, inMaxTwo};
+		return true;
 	}
 	
 	// min two is between the planes of one
 	if(inMinOne <= inMinTwo && inMaxOne >= inMinTwo)
 	{
-		return IntersectPoint {inMinTwo, inMaxOne};
+		outIntersectPoint = {inMinTwo, inMaxOne};
+		return true;
 	}
 	
-	return kZero_Interserct;
+	return false;
 }
 
 /**/
-Cuboid GetIntersection(
+bool GetIntersection(
 	const Cuboid& inInput1,
-	const Cuboid& inInput2)
+	const Cuboid& inInput2,
+	Cuboid& outCuboid)
 {
+	bool overlaps = false;
 	// x
-	auto xIntersect = DimOverlap(
-							inInput1.minCorner.x, inInput1.minCorner.x + inInput1.mXDim - 1,
-							inInput2.minCorner.x, inInput2.minCorner.x + inInput2.mXDim - 1);
-	if(!xIntersect)
+	IntersectPoint xIntersect;
+	overlaps = DimOverlap(
+		inInput1.minCorner.x, inInput1.minCorner.x + inInput1.mXDim - 1,
+		inInput2.minCorner.x, inInput2.minCorner.x + inInput2.mXDim - 1,
+		xIntersect);
+	if(!overlaps)
 	{
-		return kZeroCuboid;
+		return false;
 	}
 	
 	// y
-	auto yIntersect = DimOverlap(
-							inInput1.minCorner.y, inInput1.minCorner.y + inInput1.mYDim - 1,
-							inInput2.minCorner.y, inInput2.minCorner.y + inInput2.mYDim - 1);
-	if(!yIntersect)
+	IntersectPoint yIntersect;
+	overlaps = DimOverlap(
+		inInput1.minCorner.y, inInput1.minCorner.y + inInput1.mYDim - 1,
+		inInput2.minCorner.y, inInput2.minCorner.y + inInput2.mYDim - 1,
+		yIntersect);
+	if(!overlaps)
 	{
-		return kZeroCuboid;
+		return false;
 	}
 	
 	// z
-	auto zIntersect = DimOverlap(
-							inInput1.minCorner.z, inInput1.minCorner.z + inInput1.mZDim - 1,
-							inInput2.minCorner.z, inInput2.minCorner.z + inInput2.mZDim - 1);
-	if(!zIntersect)
+	IntersectPoint zIntersect;
+	overlaps = DimOverlap(
+		inInput1.minCorner.z, inInput1.minCorner.z + inInput1.mZDim - 1,
+		inInput2.minCorner.z, inInput2.minCorner.z + inInput2.mZDim - 1,
+		zIntersect);
+	if(!overlaps)
 	{
-		return kZeroCuboid;
+		return false;
 	}
 	
-	return CreateCuboid(
+	outCuboid = CreateCuboid(
 		xIntersect.mMin, xIntersect.mMax,
 		yIntersect.mMin, yIntersect.mMax,
 		zIntersect.mMin, zIntersect.mMax);
+	return true;
 }
 
 } // P22

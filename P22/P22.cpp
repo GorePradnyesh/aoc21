@@ -46,6 +46,7 @@ void ProcessInner()
 /**/
 void Process()
 {
+	// TestPlaneOverlap();
 	TestCubeGeneration();
 	
 	// ProcessInner();
