@@ -31,10 +31,36 @@ constexpr IntersectPoint kZero_Interserct {0, 0};
 struct Cuboid
 {
 	Coord minCorner;
-	std::uint32_t mXDim; 	// x
-	std::uint32_t mYDim; 	// y
-	std::uint32_t mZDim;	// z
+	std::int32_t mXDim; 	// x
+	std::int32_t mYDim; 	// y
+	std::int32_t mZDim;	// z
+	
+	std::int32_t GetVolume();
 }; //
+
+/**/
+inline std::int32_t Cuboid::GetVolume()
+{
+	return mXDim * mYDim * mZDim;
+}
+
+
+
+Cuboid CreateCuboid(
+		std::int32_t inXLow,
+		std::int32_t inXHigh,
+		std::int32_t inYLow,
+		std::int32_t inYHigh,
+		std::int32_t inZLow,
+		std::int32_t inZHigh)
+{
+	//
+	return Cuboid {
+		Coord {inXLow, inYLow, inZLow},
+		inXHigh - inXLow + 1,
+		inYHigh - inYLow + 1,
+		inZHigh - inZLow + 1};
+}
 
 
 constexpr Cuboid kZeroCuboid { kZero, 0, 0, 0 };
@@ -91,8 +117,8 @@ Cuboid GetIntersection(
 {
 	// x
 	auto xIntersect = DimOverlap(
-							inInput1.minCorner.x, inInput1.minCorner.x + inInput1.mXDim,
-							inInput2.minCorner.x, inInput2.minCorner.x + inInput2.mXDim);
+							inInput1.minCorner.x, inInput1.minCorner.x + inInput1.mXDim - 1,
+							inInput2.minCorner.x, inInput2.minCorner.x + inInput2.mXDim - 1);
 	if(!xIntersect)
 	{
 		return kZeroCuboid;
@@ -100,8 +126,8 @@ Cuboid GetIntersection(
 	
 	// y
 	auto yIntersect = DimOverlap(
-							inInput1.minCorner.y, inInput1.minCorner.y + inInput1.mYDim,
-							inInput2.minCorner.y, inInput2.minCorner.y + inInput2.mYDim);
+							inInput1.minCorner.y, inInput1.minCorner.y + inInput1.mYDim - 1,
+							inInput2.minCorner.y, inInput2.minCorner.y + inInput2.mYDim - 1);
 	if(!yIntersect)
 	{
 		return kZeroCuboid;
@@ -109,13 +135,17 @@ Cuboid GetIntersection(
 	
 	// z
 	auto zIntersect = DimOverlap(
-							inInput1.minCorner.z, inInput1.minCorner.z + inInput1.mZDim,
-							inInput2.minCorner.z, inInput2.minCorner.z + inInput2.mZDim);
+							inInput1.minCorner.z, inInput1.minCorner.z + inInput1.mZDim - 1,
+							inInput2.minCorner.z, inInput2.minCorner.z + inInput2.mZDim - 1);
 	if(!zIntersect)
 	{
 		return kZeroCuboid;
 	}
-	return kZeroCuboid;
+	
+	return CreateCuboid(
+		xIntersect.mMin, xIntersect.mMax,
+		yIntersect.mMin, yIntersect.mMax,
+		zIntersect.mMin, zIntersect.mMax);
 }
 
 } // P22

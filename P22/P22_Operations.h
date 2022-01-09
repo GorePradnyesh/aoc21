@@ -58,6 +58,11 @@ public:
 };
 
 
+/**/
+Cuboid CreateCuboid(const RebootStep& inStep)
+{
+	return CreateCuboid(inStep.mXLow, inStep.mXHigh, inStep.mYLow, inStep.mYHigh, inStep.mZLow, inStep.mZHigh);
+}
 
 /**/
 void ProcessLines(
